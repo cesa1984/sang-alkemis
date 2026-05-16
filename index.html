@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2a1f17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Sang Alkemis — Bahasa Indonesia ↔ English</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Crimson+Pro:ital,wght@0,400;0,500;1,400&family=Cinzel:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- LIBRARY VIEW -->
+<div id="library-view" class="view">
+  <header class="lib-header">
+    <h1>Sang Alkemis</h1>
+    <div class="subtitle">Bahasa Indonesia ↔ English</div>
+  </header>
+
+  <div class="actions">
+    <button id="import-btn" class="action-btn primary">
+      <span class="icon">+</span> Kapitel importieren
+    </button>
+    <input type="file" id="import-input" accept=".json" hidden>
+    <button id="stats-btn" class="action-btn">
+      <span class="icon">📊</span> Lernstand
+    </button>
+    <button id="reset-btn" class="action-btn danger">
+      <span class="icon">🗑</span> Alle Daten löschen
+    </button>
+  </div>
+
+  <div id="chapter-list" class="chapter-list">
+    <!-- chapters injected here -->
+  </div>
+
+  <div class="instructions">
+    <strong>Bedienung:</strong>
+    <ul>
+      <li><b>Kurzer Klick</b> auf ein Wort → englische Übersetzung anzeigen</li>
+      <li><b>Lange drücken</b> auf ein Wort → ganzen Satz übersetzen</li>
+      <li><b>Doppel-Klick</b> auf ein Wort → als "bekannt" markieren (gedämpft)</li>
+      <li><b>Erneuter Doppel-Klick</b> → wieder als "lernend" markieren</li>
+    </ul>
+  </div>
+
+  <footer>❦ Radikal Collection</footer>
+</div>
+
+<!-- READER VIEW -->
+<div id="reader-view" class="view hidden">
+  <div class="reader-header">
+    <button id="back-btn" class="icon-btn" aria-label="Zurück">←</button>
+    <div class="reader-title">
+      <h2 id="chapter-title">—</h2>
+      <div id="chapter-progress" class="progress-mini">—</div>
+    </div>
+    <button id="settings-btn" class="icon-btn" aria-label="Einstellungen">⚙</button>
+  </div>
+
+  <div id="story" class="story"></div>
+
+  <!-- Floating bottom bar for sentence translation -->
+  <div id="sentence-bar" class="sentence-bar hidden">
+    <button id="close-sentence" class="close-x" aria-label="Schließen">×</button>
+    <div class="sentence-id" id="sentence-id"></div>
+    <div class="sentence-en" id="sentence-en"></div>
+  </div>
+</div>
+
+<!-- STATS MODAL -->
+<div id="stats-modal" class="modal hidden">
+  <div class="modal-content">
+    <button class="close-x" data-close-modal>×</button>
+    <h2>Dein Lernstand</h2>
+    <div id="stats-content"></div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settings-modal" class="modal hidden">
+  <div class="modal-content">
+    <button class="close-x" data-close-modal>×</button>
+    <h2>Einstellungen</h2>
+    <label class="setting-row">
+      <span>Bekannte Wörter ausblenden (gedämpft)</span>
+      <input type="checkbox" id="setting-dim-known" checked>
+    </label>
+    <label class="setting-row">
+      <span>Schriftgröße</span>
+      <input type="range" id="setting-fontsize" min="14" max="28" value="20">
+    </label>
+    <div class="setting-row">
+      <button id="reset-chapter-btn" class="action-btn danger small">
+        Lernstand dieses Kapitels zurücksetzen
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast hidden"></div>
+
+<script src="app.js"></script>
+<script>
+// Register service worker for PWA offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(err => {
+      console.log('SW registration skipped:', err);
+    });
+  });
+}
+</script>
+</body>
+</html>
