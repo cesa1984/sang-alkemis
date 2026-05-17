@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2a1f17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Sang Alkemis — Bahasa Indonesia ↔ English</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Crimson+Pro:ital,wght@0,400;0,500;1,400&family=Cinzel:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- LIBRARY VIEW -->
+<div id="library-view" class="view">
+  <header class="lib-header">
+    <h1>Sang Alkemis</h1>
+    <div class="subtitle">Bahasa Indonesia ↔ English</div>
+  </header>
+
+  <div class="actions">
+    <button id="import-btn" class="action-btn primary">
+      <span class="icon">+</span> Import chapter
+    </button>
+    <input type="file" id="import-input" accept=".json" hidden>
+    <button id="dict-btn" class="action-btn">
+      <span class="icon">📖</span> Dictionary
+    </button>
+    <button id="stats-btn" class="action-btn">
+      <span class="icon">📊</span> Progress
+    </button>
+    <button id="reset-btn" class="action-btn danger">
+      <span class="icon">🗑</span> Clear all data
+    </button>
+  </div>
+
+  <div id="chapter-list" class="chapter-list">
+    <!-- chapters injected here -->
+  </div>
+
+  <div class="instructions">
+    <strong>How to use:</strong>
+    <ul>
+      <li><b>Tap a word</b> → show English translation</li>
+      <li><b>Long-press a word</b> → translate the whole sentence</li>
+      <li><b>Double-tap a word</b> → mark as "known" (dimmed)</li>
+      <li><b>Double-tap again</b> → mark as "learning" again</li>
+    </ul>
+  </div>
+
+  <footer>❦ Radikal Collection</footer>
+</div>
+
+<!-- DICTIONARY VIEW -->
+<div id="dict-view" class="view hidden">
+  <div class="reader-header">
+    <button id="dict-back-btn" class="icon-btn" aria-label="Back">←</button>
+    <div class="reader-title">
+      <h2>Dictionary</h2>
+      <div id="dict-count" class="progress-mini">—</div>
+    </div>
+    <button class="icon-btn" style="visibility:hidden">⚲</button>
+  </div>
+
+  <div class="dict-controls">
+    <input type="search" id="dict-search" placeholder="Search Indonesian or English…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <div class="dict-filter-bar" id="dict-filter-bar">
+      <label><input type="radio" name="dict-filter" value="all" checked> All</label>
+      <label><input type="radio" name="dict-filter" value="learning"> Learning</label>
+      <label><input type="radio" name="dict-filter" value="known"> Known</label>
+    </div>
+  </div>
+
+  <div id="dict-list" class="dict-list"></div>
+</div>
+
+<!-- READER VIEW -->
+<div id="reader-view" class="view hidden">
+  <div class="reader-header">
+    <button id="back-btn" class="icon-btn" aria-label="Back">←</button>
+    <div class="reader-title">
+      <h2 id="chapter-title">—</h2>
+      <div id="chapter-progress" class="progress-mini">—</div>
+    </div>
+    <button id="settings-btn" class="icon-btn" aria-label="Settings">⚙</button>
+  </div>
+
+  <div id="story" class="story"></div>
+
+  <!-- Floating bottom bar for sentence translation -->
+  <div id="sentence-bar" class="sentence-bar hidden">
+    <button id="close-sentence" class="close-x" aria-label="Close">×</button>
+    <div class="sentence-id" id="sentence-id"></div>
+    <div class="sentence-en" id="sentence-en"></div>
+  </div>
+</div>
+
+<!-- STATS MODAL -->
+<div id="stats-modal" class="modal hidden">
+  <div class="modal-content">
+    <button class="close-x" data-close-modal>×</button>
+    <h2>Your Progress</h2>
+    <div id="stats-content"></div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settings-modal" class="modal hidden">
+  <div class="modal-content">
+    <button class="close-x" data-close-modal>×</button>
+    <h2>Settings</h2>
+    <label class="setting-row">
+      <span>Dim known words</span>
+      <input type="checkbox" id="setting-dim-known" checked>
+    </label>
+    <label class="setting-row">
+      <span>Font size</span>
+      <input type="range" id="setting-fontsize" min="14" max="28" value="20">
+    </label>
+    <div class="setting-row">
+      <button id="reset-chapter-btn" class="action-btn danger small">
+        Reset progress for this chapter
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast hidden"></div>
+
+<script src="app.js"></script>
+<script>
+// Register service worker for PWA offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(err => {
+      console.log('SW registration skipped:', err);
+    });
+  });
+}
+</script>
+</body>
+</html>

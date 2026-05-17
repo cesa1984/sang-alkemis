@@ -1,0 +1,689 @@
+/* ============================================================
+   Sang Alkemis — Bahasa Indonesia Learning App
+   ============================================================ */
+
+:root {
+  --paper: #f4ead5;
+  --paper-shadow: #e8dcc0;
+  --ink: #2a1f17;
+  --ink-soft: #5a4a3a;
+  --ink-muted: #8a7a6a;
+  --accent: #8b3a1f;
+  --accent-soft: #c97a5a;
+  --gold: #b08850;
+  --slot-bg: #fff8e7;
+  --slot-border: #d4c4a0;
+  --success: #5a7a3a;
+  --known: #a89880;
+  --base-font-size: 20px;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  min-height: 100vh;
+  overscroll-behavior: none;
+}
+
+body {
+  background-image:
+    radial-gradient(ellipse at top, rgba(176, 136, 80, 0.08), transparent 70%),
+    radial-gradient(ellipse at bottom, rgba(139, 58, 31, 0.06), transparent 70%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.4 0 0 0 0 0.3 0 0 0 0 0.2 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.view {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  min-height: 100vh;
+}
+
+.hidden { display: none !important; }
+
+/* ============================================================
+   LIBRARY VIEW
+   ============================================================ */
+
+.lib-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--gold);
+  position: relative;
+}
+.lib-header::after {
+  content: "✦";
+  position: absolute;
+  bottom: -0.7rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--paper);
+  padding: 0 1rem;
+  color: var(--gold);
+}
+
+.lib-header h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 2.2rem;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  font-style: italic;
+  color: var(--ink-soft);
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.action-btn {
+  font-family: 'Cinzel', serif;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--ink);
+  padding: 0.6rem 1rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.action-btn:hover, .action-btn:active {
+  background: var(--gold);
+  color: var(--paper);
+}
+.action-btn.primary {
+  background: var(--accent);
+  color: var(--paper);
+  border-color: var(--accent);
+}
+.action-btn.primary:hover, .action-btn.primary:active {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+.action-btn.danger {
+  border-color: #a44;
+  color: #a44;
+}
+.action-btn.danger:hover {
+  background: #a44;
+  color: var(--paper);
+}
+.action-btn.small {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.7rem;
+}
+
+.chapter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 3rem;
+}
+
+.chapter-card {
+  background: rgba(255, 248, 231, 0.5);
+  border: 1px solid var(--slot-border);
+  border-left: 4px solid var(--accent);
+  padding: 1.2rem 1.4rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 2px;
+  position: relative;
+}
+.chapter-card:hover, .chapter-card:active {
+  background: rgba(255, 248, 231, 0.9);
+  transform: translateX(2px);
+  box-shadow: 2px 2px 0 var(--gold);
+}
+.chapter-card .ch-num {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+.chapter-card .ch-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.05rem;
+  letter-spacing: 0.1em;
+  margin-top: 0.2rem;
+  text-transform: uppercase;
+}
+.chapter-card .ch-meta {
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  margin-top: 0.4rem;
+}
+.chapter-card .ch-progress {
+  margin-top: 0.6rem;
+  height: 3px;
+  background: var(--slot-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.chapter-card .ch-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+.chapter-card .ch-delete {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  color: var(--ink-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+  border-radius: 50%;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+.chapter-card .ch-delete:hover {
+  opacity: 1;
+  color: #a44;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  border: 1px dashed var(--gold);
+  border-radius: 4px;
+}
+
+.instructions {
+  background: rgba(255, 248, 231, 0.6);
+  border-left: 3px solid var(--accent);
+  padding: 1rem 1.5rem;
+  margin: 2rem 0 0;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  font-family: 'Crimson Pro', Georgia, serif;
+  line-height: 1.7;
+}
+.instructions strong { color: var(--accent); font-weight: 600; }
+.instructions ul { margin: 0.5rem 0 0; padding-left: 1.2rem; }
+.instructions li { margin-bottom: 0.3rem; }
+.instructions b { color: var(--ink); }
+
+footer {
+  margin-top: 3rem;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   READER VIEW
+   ============================================================ */
+
+.reader-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--gold);
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.4rem 0.7rem;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+.icon-btn:hover, .icon-btn:active {
+  background: rgba(176, 136, 80, 0.2);
+}
+
+.reader-title {
+  flex: 1;
+  text-align: center;
+}
+.reader-title h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+  margin: 0;
+  text-transform: uppercase;
+}
+.progress-mini {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin-top: 0.2rem;
+}
+
+.story {
+  font-size: var(--base-font-size);
+  line-height: 2.4;
+  text-align: justify;
+  padding-bottom: 6rem;
+}
+.story p {
+  margin: 0 0 1.4rem;
+}
+.story p:first-of-type::first-letter {
+  font-family: 'Cinzel', serif;
+  font-size: 3.2rem;
+  float: left;
+  line-height: 0.85;
+  padding: 0.3rem 0.5rem 0 0;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Word units */
+.word-unit {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 0.1rem 0.3rem;
+  vertical-align: top;
+  line-height: 1.2;
+  position: relative;
+}
+
+.word {
+  cursor: pointer;
+  padding: 0.05rem 0.2rem;
+  border-radius: 3px;
+  transition: background 0.2s ease, color 0.2s ease, opacity 0.3s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  color: var(--ink);
+  border-bottom: 1px dotted transparent;
+  touch-action: manipulation;
+}
+.word:hover {
+  background: rgba(176, 136, 80, 0.18);
+  border-bottom-color: var(--gold);
+}
+.word.active {
+  background: var(--accent);
+  color: var(--paper);
+  border-bottom-color: var(--accent);
+}
+.word.long-pressing {
+  background: var(--gold);
+  color: var(--paper);
+  transform: scale(0.95);
+}
+
+/* KNOWN words: dimmed */
+.word-unit.known .word {
+  color: var(--known);
+  font-weight: 300;
+  opacity: 0.55;
+}
+.word-unit.known .word:hover {
+  opacity: 0.9;
+}
+
+/* Translation slot */
+.slot {
+  min-width: 100%;
+  height: 1.2rem;
+  margin-top: 0.1rem;
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-style: italic;
+  font-size: 0.7em;
+  color: var(--accent);
+  text-align: center;
+  white-space: nowrap;
+  line-height: 1.2rem;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  border-top: 1px dotted var(--slot-border);
+  padding: 0 0.2rem;
+}
+.word-unit.visible .slot {
+  opacity: 1;
+}
+
+/* Punctuation */
+.punct {
+  color: var(--ink);
+  margin: 0 1px;
+}
+
+.dialog { color: var(--accent); font-style: italic; }
+
+/* Sentence translation bar (floating bottom) */
+.sentence-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 1.2rem 1.5rem 1.5rem;
+  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
+  max-height: 50vh;
+  overflow-y: auto;
+  z-index: 100;
+  transform: translateY(0);
+  transition: transform 0.3s ease;
+  border-top: 2px solid var(--accent);
+}
+.sentence-bar.hidden {
+  transform: translateY(100%);
+  display: block !important;
+  pointer-events: none;
+}
+.sentence-bar .close-x {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.8rem;
+  background: transparent;
+  border: none;
+  color: var(--paper);
+  font-size: 1.5rem;
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 0.3rem 0.6rem;
+}
+.sentence-bar .close-x:hover { opacity: 1; }
+.sentence-id {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--accent-soft);
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+.sentence-en {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(42, 31, 23, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+.modal-content {
+  background: var(--paper);
+  border: 1px solid var(--gold);
+  padding: 2rem 1.5rem 1.5rem;
+  border-radius: 4px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+.modal-content h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.2em;
+  margin: 0 0 1.5rem;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--accent);
+}
+.modal-content .close-x {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.8rem;
+  background: transparent;
+  border: none;
+  color: var(--ink);
+  font-size: 1.6rem;
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 0.3rem 0.6rem;
+}
+.modal-content .close-x:hover { opacity: 1; }
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 0;
+  border-bottom: 1px dotted var(--slot-border);
+  gap: 1rem;
+}
+.setting-row:last-child { border-bottom: none; }
+
+/* Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.stat-card {
+  background: rgba(255, 248, 231, 0.6);
+  border-left: 3px solid var(--accent);
+  padding: 0.8rem 1rem;
+  border-radius: 2px;
+}
+.stat-value {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin-top: 0.2rem;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.8rem 1.4rem;
+  border-radius: 24px;
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 2000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* ============================================================
+   DICTIONARY VIEW
+   ============================================================ */
+
+.dict-controls {
+  margin-bottom: 1rem;
+}
+
+#dict-search {
+  width: 100%;
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 1rem;
+  padding: 0.7rem 1rem;
+  background: var(--slot-bg);
+  border: 1px solid var(--slot-border);
+  border-radius: 4px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+}
+#dict-search:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(139, 58, 31, 0.15);
+}
+
+.dict-filter-bar {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 0.7rem;
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 0.9rem;
+  flex-wrap: wrap;
+}
+.dict-filter-bar label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  padding: 0.2rem 0.6rem;
+  border-radius: 14px;
+  transition: background 0.2s;
+}
+.dict-filter-bar label:hover {
+  background: rgba(176, 136, 80, 0.15);
+}
+.dict-filter-bar input[type="radio"] {
+  accent-color: var(--accent);
+}
+
+.dict-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid var(--slot-border);
+}
+
+.dict-letter-header {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  text-transform: uppercase;
+  padding: 1rem 0 0.4rem;
+  border-bottom: 1px dotted var(--gold);
+  margin-bottom: 0.3rem;
+}
+
+.dict-entry {
+  padding: 0.7rem 0.3rem;
+  border-bottom: 1px dotted var(--slot-border);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.dict-entry:hover {
+  background: rgba(255, 248, 231, 0.6);
+}
+.dict-entry.known {
+  opacity: 0.5;
+}
+.dict-entry.known .dict-word {
+  color: var(--known);
+  font-weight: 300;
+}
+
+.dict-word {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--ink);
+  flex: 0 0 40%;
+  min-width: 0;
+  word-break: break-word;
+}
+.dict-translations {
+  flex: 1;
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--accent);
+  line-height: 1.45;
+  word-break: break-word;
+}
+.dict-translations .count {
+  font-style: normal;
+  color: var(--ink-muted);
+  font-size: 0.8em;
+  margin-left: 0.3rem;
+}
+.dict-mark {
+  flex: 0 0 auto;
+  font-size: 1.1rem;
+  color: var(--ink-muted);
+  padding: 0 0.3rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+}
+.dict-entry.known .dict-mark {
+  color: var(--success);
+}
+
+.dict-empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 600px) {
+  .view { padding: 1rem 0.8rem 4rem; }
+  .lib-header h1 { font-size: 1.5rem; letter-spacing: 0.15em; }
+  .story { font-size: var(--base-font-size); line-height: 2.3; }
+  .slot { font-size: 0.65em; }
+  .stats-grid { grid-template-columns: 1fr; }
+  .actions { flex-direction: column; }
+  .action-btn { width: 100%; justify-content: center; }
+  .reader-title h2 { font-size: 0.85rem; }
+  .dict-word { flex: 0 0 38%; font-size: 1.05rem; }
+  .dict-translations { font-size: 0.88rem; }
+}
