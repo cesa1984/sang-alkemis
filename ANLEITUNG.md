@@ -143,6 +143,53 @@ du alle Wörter aus allen geladenen Kapiteln, alphabetisch sortiert.
   verschiedenen Kontexten hatte. Eine Zahl wie `×3` zeigt an, wie
   oft diese Übersetzung im Text vorkam.
 
+## Vokabel-Test (Spaced Repetition)
+
+Im Wörterbuch oben rechts findest du das **Stift-Symbol (✎)** —
+das startet einen Vokabel-Test. Er funktioniert nach dem Prinzip
+"Spaced Repetition", einer wissenschaftlich erwiesenen Methode für
+nachhaltiges Vokabellernen.
+
+**Wie eine Session abläuft:**
+
+1. Du siehst ein indonesisches Wort auf einer großen Karte.
+2. Denke die englische Übersetzung im Kopf.
+3. Tippe auf die Karte, um die Übersetzung aufzudecken.
+4. Bewerte ehrlich: **"Knew it"** oder **"Didn't know"**.
+5. Nach 10 Karten erhältst du eine Session-Zusammenfassung.
+
+**Wie das Lernsystem funktioniert:**
+
+Jedes Wort durchläuft 6 Stufen mit immer längeren Wiederhol-Intervallen:
+
+| Stufe | Wenn richtig | Nächste Abfrage |
+|-------|-------------|------------------|
+| Neu   | → Stufe 1   | morgen          |
+| 1     | → Stufe 2   | in 3 Tagen      |
+| 2     | → Stufe 3   | in 7 Tagen      |
+| 3     | → Stufe 4   | in 14 Tagen     |
+| 4     | → Stufe 5   | in 30 Tagen     |
+| 5     | → Stufe 6   | in 90 Tagen     |
+| 6     | gemeistert! | wird als "bekannt" markiert |
+
+**Bei einer falschen Antwort** fällt das Wort zurück auf Stufe 1 und
+kommt morgen wieder dran. So vergisst du nichts.
+
+**Auswahl der Wörter:**
+
+- Zuerst werden alle Wörter angezeigt, die heute fällig sind.
+- Wenn weniger als 10 fällig sind, kommen neue Wörter dazu —
+  die häufigsten im Buch zuerst (damit du beim Lesen schnell
+  Fortschritte machst).
+- Grammatikalische Partikel (wie *yang, di, ke, dan, itu*) und sehr
+  kurze Wörter werden vom Test ausgeschlossen — die lernst du beim
+  Lesen automatisch.
+
+**Tipp:** Mache am besten täglich eine Session. Das System sorgt dann
+selbst dafür, dass du Wörter genau dann wiederholst, wenn du sie sonst
+gerade vergessen würdest — das ist effizienter als 100 Wörter an einem
+Tag durchzupauken.
+
 ---
 
 ## Neue Kapitel hinzufügen

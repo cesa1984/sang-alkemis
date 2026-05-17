@@ -66,7 +66,7 @@
       <h2>Dictionary</h2>
       <div id="dict-count" class="progress-mini">—</div>
     </div>
-    <button class="icon-btn" style="visibility:hidden">⚲</button>
+    <button id="test-start-btn" class="icon-btn" aria-label="Vocabulary test" title="Start test">✎</button>
   </div>
 
   <div class="dict-controls">
@@ -79,6 +79,68 @@
   </div>
 
   <div id="dict-list" class="dict-list"></div>
+</div>
+
+<!-- TEST VIEW -->
+<div id="test-view" class="view hidden">
+  <div class="reader-header">
+    <button id="test-back-btn" class="icon-btn" aria-label="Back">←</button>
+    <div class="reader-title">
+      <h2>Vocabulary Test</h2>
+      <div id="test-progress" class="progress-mini">—</div>
+    </div>
+    <button class="icon-btn" style="visibility:hidden">⚲</button>
+  </div>
+
+  <!-- Test start screen -->
+  <div id="test-start" class="test-start">
+    <div class="test-intro">
+      <p><strong>How it works:</strong></p>
+      <ul>
+        <li>You'll be shown <b>10 Indonesian words</b>, one at a time.</li>
+        <li>Think of the English translation, then tap the card to reveal it.</li>
+        <li>Mark whether you <b>knew it</b> or <b>didn't</b>.</li>
+        <li>Words you know move further apart in time (spaced repetition). Words you don't know come back tomorrow.</li>
+        <li>New words are introduced by frequency in the book — the most common ones first.</li>
+      </ul>
+    </div>
+    <div class="test-status" id="test-status-info"></div>
+    <button id="test-begin-btn" class="action-btn primary big-btn">Start session</button>
+  </div>
+
+  <!-- Test card screen -->
+  <div id="test-card-screen" class="test-card-screen hidden">
+    <div class="test-card" id="test-card">
+      <div class="test-card-front">
+        <div class="test-word-id" id="test-word-id"></div>
+        <div class="test-hint" id="test-hint">tap to reveal</div>
+      </div>
+      <div class="test-card-back hidden" id="test-card-back">
+        <div class="test-word-id-small" id="test-word-id-small"></div>
+        <div class="test-translations" id="test-translations"></div>
+      </div>
+    </div>
+    <div class="test-actions hidden" id="test-actions">
+      <button id="test-wrong-btn" class="test-action-btn wrong">
+        <span class="test-icon">✗</span>
+        <span class="test-label">Didn't know</span>
+      </button>
+      <button id="test-right-btn" class="test-action-btn right">
+        <span class="test-icon">✓</span>
+        <span class="test-label">Knew it</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Test summary screen -->
+  <div id="test-summary" class="test-summary hidden">
+    <h3>Session complete</h3>
+    <div class="test-summary-stats" id="test-summary-stats"></div>
+    <div class="test-summary-actions">
+      <button id="test-restart-btn" class="action-btn primary">Another session</button>
+      <button id="test-finish-btn" class="action-btn">Back to dictionary</button>
+    </div>
+  </div>
 </div>
 
 <!-- READER VIEW -->

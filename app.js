@@ -13,6 +13,7 @@
     CHAPTERS: 'sangalkemis_chapters_v1',
     PROGRESS: 'sangalkemis_progress_v1',
     SETTINGS: 'sangalkemis_settings_v1',
+    SRS: 'sangalkemis_srs_v1',
   };
 
   // Built-in chapters loaded from /chapters/ folder
@@ -34,6 +35,12 @@
   let lastClickTime = 0;
   let lastClickUnit = null;
 
+  // SRS (Spaced Repetition System) state
+  // srsData maps wordKey -> { level: 0..6, nextDue: ISO timestamp ms, lastReviewed: ms, correctCount: 0, wrongCount: 0 }
+  let srsData = {};
+  // Current test session state
+  let testSession = null; // { queue: [keys], currentIdx: 0, results: [{key, knew}], totalCorrect: 0, newWords: 0 }
+
   // ============================================================
   // STORAGE HELPERS
   // ============================================================
@@ -46,6 +53,8 @@
       if (p) progress = JSON.parse(p);
       const s = localStorage.getItem(STORAGE_KEYS.SETTINGS);
       if (s) settings = Object.assign(settings, JSON.parse(s));
+      const sr = localStorage.getItem(STORAGE_KEYS.SRS);
+      if (sr) srsData = JSON.parse(sr);
     } catch (e) {
       console.error('Storage load failed:', e);
     }
@@ -62,6 +71,10 @@
   function saveSettings() {
     try { localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings)); }
     catch (e) { console.error('Save settings failed:', e); }
+  }
+  function saveSRS() {
+    try { localStorage.setItem(STORAGE_KEYS.SRS, JSON.stringify(srsData)); }
+    catch (e) { console.error('Save SRS failed:', e); }
   }
 
   // Word key: normalize for consistent lookup
@@ -620,6 +633,343 @@
   }
 
   // ============================================================
+  // SPACED REPETITION SYSTEM (SRS)
+  // ============================================================
+
+  // Intervals in milliseconds for each level
+  // Level 0 = brand new, never reviewed (due immediately)
+  // Level 1 = reviewed once correctly, next in 1 day
+  // ... etc.
+  const SRS_INTERVALS_MS = [
+    0,                          // L0: immediately
+    1  * 24 * 60 * 60 * 1000,   // L1: 1 day
+    3  * 24 * 60 * 60 * 1000,   // L2: 3 days
+    7  * 24 * 60 * 60 * 1000,   // L3: 7 days
+    14 * 24 * 60 * 60 * 1000,   // L4: 14 days
+    30 * 24 * 60 * 60 * 1000,   // L5: 30 days
+    90 * 24 * 60 * 60 * 1000,   // L6: 90 days (mastered)
+  ];
+  const SRS_MAX_LEVEL = SRS_INTERVALS_MS.length - 1;
+
+  // Indonesian grammatical particles and very common function words to EXCLUDE from test
+  // These are learned passively through reading
+  const TEST_EXCLUDED_WORDS = new Set([
+    // Articles & determiners
+    'yang', 'itu', 'ini', 'tadi', 'tu', 'nya',
+    // Prepositions
+    'di', 'ke', 'dari', 'pada', 'untuk', 'oleh', 'dengan',
+    // Pronouns (common ones)
+    'aku', 'ku', 'mu', 'kau', 'kamu', 'engkau', 'ia', 'dia', 'kita', 'kami', 'mereka', 'kalian',
+    // Conjunctions
+    'dan', 'atau', 'tapi', 'tetapi', 'jika', 'kalau', 'karena', 'sebab', 'maka', 'jadi', 'lalu', 'kemudian',
+    'ketika', 'saat', 'sebelum', 'setelah', 'sesudah', 'sambil', 'meski', 'meskipun', 'walau', 'walaupun',
+    'bahwa', 'agar', 'supaya', 'sehingga', 'hingga', 'sampai',
+    // Particles
+    'lah', 'kah', 'pun', 'tah',
+    // Negation
+    'tidak', 'tak', 'bukan', 'jangan', 'belum',
+    // Affirmation
+    'ya', 'sudah',
+    // Common short words
+    'ada', 'akan', 'mau', 'bisa', 'dapat',
+  ]);
+
+  function isTestableWord(key) {
+    if (!key) return false;
+    if (key.length < 3) return false;
+    if (TEST_EXCLUDED_WORDS.has(key)) return false;
+    return true;
+  }
+
+  function isSrsDue(key, now) {
+    const entry = srsData[key];
+    if (!entry) return true; // Never reviewed = due (level 0)
+    return entry.nextDue <= now;
+  }
+
+  // Get all testable words with their frequency across all chapters
+  function getAllTestableWordsByFrequency() {
+    const freq = new Map(); // key -> { count: N, display: id }
+    Object.values(chapters).forEach(ch => {
+      (ch.tokens || []).forEach(sentence => {
+        if (typeof sentence !== 'object' || !sentence || !sentence.t) return;
+        sentence.t.forEach(tok => {
+          if (!Array.isArray(tok)) return;
+          const k = wordKey(tok[0]);
+          if (!isTestableWord(k)) return;
+          if (!freq.has(k)) {
+            freq.set(k, { key: k, count: 0, display: tok[0].toLowerCase() });
+          }
+          freq.get(k).count++;
+        });
+      });
+    });
+    const arr = Array.from(freq.values());
+    arr.sort((a, b) => b.count - a.count); // Most frequent first
+    return arr;
+  }
+
+  // Determine the queue of 10 words for a test session
+  function buildTestQueue(sessionSize = 10) {
+    const now = Date.now();
+    const allWords = getAllTestableWordsByFrequency();
+
+    // Step 1: Find words that are DUE for review (level > 0, nextDue <= now)
+    const dueReviews = allWords.filter(w => {
+      const entry = srsData[w.key];
+      return entry && entry.nextDue <= now;
+    });
+
+    // Step 2: New words (no SRS entry yet), sorted by frequency
+    const newWords = allWords.filter(w => !srsData[w.key]);
+
+    // Build queue: prioritize due reviews, fill with new words
+    const queue = [];
+    let newWordsAdded = 0;
+
+    // Add due reviews first (in random order)
+    const shuffledDue = shuffle(dueReviews.map(w => w.key));
+    for (const k of shuffledDue) {
+      if (queue.length >= sessionSize) break;
+      queue.push(k);
+    }
+
+    // Fill remaining slots with new words (in frequency order)
+    for (const w of newWords) {
+      if (queue.length >= sessionSize) break;
+      queue.push(w.key);
+      newWordsAdded++;
+    }
+
+    // Shuffle the final queue so reviews and new words are mixed
+    return { queue: shuffle(queue), newWordsAdded };
+  }
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function srsReview(key, knew) {
+    const now = Date.now();
+    let entry = srsData[key];
+    if (!entry) {
+      entry = { level: 0, nextDue: 0, lastReviewed: 0, correctCount: 0, wrongCount: 0 };
+    }
+    entry.lastReviewed = now;
+    if (knew) {
+      entry.correctCount = (entry.correctCount || 0) + 1;
+      entry.level = Math.min(entry.level + 1, SRS_MAX_LEVEL);
+    } else {
+      entry.wrongCount = (entry.wrongCount || 0) + 1;
+      entry.level = 1; // Reset to "tomorrow" (level 1 = 1 day)
+    }
+    entry.nextDue = now + SRS_INTERVALS_MS[entry.level];
+    srsData[key] = entry;
+
+    // Once a word reaches max level (90 days = mastered), also mark as "known" in dictionary
+    if (entry.level >= SRS_MAX_LEVEL) {
+      progress[key] = 'known';
+      saveProgress();
+    }
+    saveSRS();
+  }
+
+  // ============================================================
+  // TEST VIEW (vocabulary test)
+  // ============================================================
+
+  function openTestView() {
+    showView('test-view');
+    renderTestStart();
+  }
+
+  function renderTestStart() {
+    document.getElementById('test-start').classList.remove('hidden');
+    document.getElementById('test-card-screen').classList.add('hidden');
+    document.getElementById('test-summary').classList.add('hidden');
+    document.getElementById('test-progress').textContent = '';
+
+    // Show status: how many are due, how many new, how many mastered
+    const now = Date.now();
+    const allWords = getAllTestableWordsByFrequency();
+    const dueCount = allWords.filter(w => {
+      const e = srsData[w.key];
+      return e && e.nextDue <= now;
+    }).length;
+    const newCount = allWords.filter(w => !srsData[w.key]).length;
+    const masteredCount = allWords.filter(w => {
+      const e = srsData[w.key];
+      return e && e.level >= SRS_MAX_LEVEL;
+    }).length;
+    const learningCount = allWords.filter(w => {
+      const e = srsData[w.key];
+      return e && e.level < SRS_MAX_LEVEL && e.level > 0;
+    }).length;
+
+    let nextDueText = '';
+    if (dueCount === 0 && newCount === 0) {
+      const future = allWords
+        .map(w => srsData[w.key])
+        .filter(e => e && e.nextDue > now)
+        .sort((a, b) => a.nextDue - b.nextDue);
+      if (future.length > 0) {
+        const nextMs = future[0].nextDue - now;
+        const hours = Math.round(nextMs / (60 * 60 * 1000));
+        const days = Math.round(nextMs / (24 * 60 * 60 * 1000));
+        if (days >= 1) nextDueText = `Next review in ${days} day${days === 1 ? '' : 's'}.`;
+        else nextDueText = `Next review in ${hours} hour${hours === 1 ? '' : 's'}.`;
+      }
+    }
+
+    const totalTestable = allWords.length;
+
+    document.getElementById('test-status-info').innerHTML = `
+      <span class="stat-line"><b>${dueCount}</b> word${dueCount === 1 ? '' : 's'} due for review</span>
+      <span class="stat-line"><b>${newCount}</b> new word${newCount === 1 ? '' : 's'} ready to learn</span>
+      <span class="stat-line"><b>${learningCount}</b> learning · <b>${masteredCount}</b> mastered · <b>${totalTestable}</b> total</span>
+      ${nextDueText ? `<span class="stat-line" style="margin-top:0.5rem">${nextDueText}</span>` : ''}
+    `;
+
+    const beginBtn = document.getElementById('test-begin-btn');
+    if (dueCount === 0 && newCount === 0) {
+      beginBtn.disabled = true;
+      beginBtn.textContent = 'Nothing to review';
+      beginBtn.style.opacity = '0.5';
+      beginBtn.style.cursor = 'not-allowed';
+    } else {
+      beginBtn.disabled = false;
+      beginBtn.textContent = 'Start session';
+      beginBtn.style.opacity = '';
+      beginBtn.style.cursor = '';
+    }
+  }
+
+  function beginTestSession() {
+    const { queue, newWordsAdded } = buildTestQueue(10);
+    if (queue.length === 0) {
+      toast('No words to test. Read more first!');
+      return;
+    }
+    testSession = {
+      queue: queue,
+      currentIdx: 0,
+      results: [],
+      totalCorrect: 0,
+      newWords: newWordsAdded,
+      startedAt: Date.now(),
+    };
+    showCurrentCard();
+  }
+
+  function showCurrentCard() {
+    if (!testSession) return;
+    const idx = testSession.currentIdx;
+    if (idx >= testSession.queue.length) {
+      showTestSummary();
+      return;
+    }
+
+    document.getElementById('test-start').classList.add('hidden');
+    document.getElementById('test-summary').classList.add('hidden');
+    document.getElementById('test-card-screen').classList.remove('hidden');
+
+    document.getElementById('test-progress').textContent =
+      `${idx + 1} / ${testSession.queue.length}`;
+
+    const key = testSession.queue[idx];
+    const entry = findDictEntryByKey(key);
+
+    // Reset card to front
+    const card = document.getElementById('test-card');
+    card.classList.remove('revealed');
+    document.getElementById('test-card-back').classList.add('hidden');
+    document.getElementById('test-actions').classList.add('hidden');
+
+    document.getElementById('test-word-id').textContent = entry ? entry.display : key;
+    document.getElementById('test-word-id-small').textContent = entry ? entry.display : key;
+
+    if (entry) {
+      const sortedT = Array.from(entry.translations.entries()).sort((a, b) => b[1] - a[1]);
+      const transHtml = sortedT.map(([t, count]) => {
+        const countLabel = count > 1 ? `<span class="count">×${count}</span>` : '';
+        return `${escapeHtml(t)}${countLabel}`;
+      }).join(', ');
+      document.getElementById('test-translations').innerHTML = transHtml;
+    } else {
+      document.getElementById('test-translations').textContent = '—';
+    }
+  }
+
+  function findDictEntryByKey(key) {
+    if (!dictData || dictData.length === 0) {
+      dictData = buildDictionary();
+    }
+    return dictData.find(e => e.key === key);
+  }
+
+  function revealCard() {
+    const card = document.getElementById('test-card');
+    if (card.classList.contains('revealed')) return;
+    card.classList.add('revealed');
+    document.getElementById('test-card-back').classList.remove('hidden');
+    document.getElementById('test-actions').classList.remove('hidden');
+    // Hide the front content (word ID is shown small at top of back)
+    document.getElementById('test-card').querySelector('.test-card-front').style.display = 'none';
+  }
+
+  function answerCard(knew) {
+    if (!testSession) return;
+    const key = testSession.queue[testSession.currentIdx];
+    srsReview(key, knew);
+    testSession.results.push({ key, knew });
+    if (knew) testSession.totalCorrect++;
+    testSession.currentIdx++;
+
+    // Restore front display for next card
+    document.getElementById('test-card').querySelector('.test-card-front').style.display = '';
+
+    setTimeout(() => showCurrentCard(), 200);
+  }
+
+  function showTestSummary() {
+    document.getElementById('test-card-screen').classList.add('hidden');
+    document.getElementById('test-summary').classList.remove('hidden');
+    document.getElementById('test-progress').textContent = '';
+
+    const total = testSession.queue.length;
+    const correct = testSession.totalCorrect;
+    const wrong = total - correct;
+    const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+    // Count how many words got newly mastered this session
+    const masteredNow = testSession.results.filter(r => {
+      const e = srsData[r.key];
+      return e && e.level >= SRS_MAX_LEVEL;
+    }).length;
+
+    document.getElementById('test-summary-stats').innerHTML = `
+      <span class="big-num">${correct} / ${total}</span>
+      <span class="label">${pct}% correct</span>
+      <div class="row">
+        <div>
+          <span class="big-num" style="font-size:1.8rem">${testSession.newWords}</span>
+          <span class="label">new words introduced</span>
+        </div>
+        <div>
+          <span class="big-num" style="font-size:1.8rem">${wrong}</span>
+          <span class="label">to review tomorrow</span>
+        </div>
+      </div>
+      ${masteredNow > 0 ? `<div style="margin-top:1rem;color:var(--success);font-style:italic">✦ ${masteredNow} word${masteredNow === 1 ? '' : 's'} mastered!</div>` : ''}
+    `;
+  }
+
+  // ============================================================
   // STATS MODAL
   // ============================================================
 
@@ -710,10 +1060,41 @@
       renderDictionary();
     });
   });
+
+  // Test view bindings
+  document.getElementById('test-start-btn').addEventListener('click', openTestView);
+  document.getElementById('test-back-btn').addEventListener('click', () => {
+    // If user backs out mid-session, just save and return - SRS state is already saved per-card
+    testSession = null;
+    showView('dict-view');
+  });
+  document.getElementById('test-begin-btn').addEventListener('click', () => {
+    if (!document.getElementById('test-begin-btn').disabled) beginTestSession();
+  });
+  document.getElementById('test-card').addEventListener('click', revealCard);
+  document.getElementById('test-right-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    answerCard(true);
+  });
+  document.getElementById('test-wrong-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    answerCard(false);
+  });
+  document.getElementById('test-restart-btn').addEventListener('click', () => {
+    renderTestStart();
+    beginTestSession();
+  });
+  document.getElementById('test-finish-btn').addEventListener('click', () => {
+    testSession = null;
+    showView('dict-view');
+  });
+
   document.getElementById('reset-btn').addEventListener('click', () => {
     if (confirm('Really delete all progress? (Chapters will be kept.)')) {
       progress = {};
+      srsData = {};
       saveProgress();
+      saveSRS();
       toast('Progress reset');
       renderLibrary();
     }

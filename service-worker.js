@@ -2,7 +2,7 @@
    Sang Alkemis — Service Worker (offline support)
    ============================================================ */
 
-const CACHE_NAME = 'sang-alkemis-v3';
+const CACHE_NAME = 'sang-alkemis-v4';
 const CORE_ASSETS = [
   './',
   './index.html',
