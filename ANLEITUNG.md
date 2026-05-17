@@ -143,52 +143,72 @@ du alle Wörter aus allen geladenen Kapiteln, alphabetisch sortiert.
   verschiedenen Kontexten hatte. Eine Zahl wie `×3` zeigt an, wie
   oft diese Übersetzung im Text vorkam.
 
-## Vokabel-Test (Spaced Repetition)
+## Vokabel-Test (Lern-Phase + Spaced Repetition)
 
 Im Wörterbuch oben rechts findest du das **Stift-Symbol (✎)** —
-das startet einen Vokabel-Test. Er funktioniert nach dem Prinzip
-"Spaced Repetition", einer wissenschaftlich erwiesenen Methode für
-nachhaltiges Vokabellernen.
+das startet einen Vokabel-Test. Das System kombiniert zwei bewährte
+Lernmethoden: kurzfristige Wiederholung am selben Tag (damit du
+dir das Wort wirklich einprägst) und Spaced Repetition über Tage
+(damit du es nicht wieder vergisst).
 
 **Wie eine Session abläuft:**
 
-1. Du siehst ein indonesisches Wort auf einer großen Karte.
-2. Denke die englische Übersetzung im Kopf.
-3. Tippe auf die Karte, um die Übersetzung aufzudecken.
-4. Bewerte ehrlich: **"Knew it"** oder **"Didn't know"**.
-5. Nach 10 Karten erhältst du eine Session-Zusammenfassung.
+1. Du beginnst mit **10 Wörtern**.
+2. Jedes Wort wird auf einer großen Karte angezeigt — du denkst die
+   englische Übersetzung.
+3. Tippe auf die Karte zum Aufdecken.
+4. Bewerte: **"Knew it"** oder **"Didn't know"**.
+5. Die Karten kommen **mehrmals in derselben Session** wieder, bis
+   du jedes Wort gut kannst.
+6. Wenn du ein Wort **2× hintereinander richtig** hast, "graduiert" es —
+   und kommt erst morgen wieder.
+7. Nach Abschluss: Zusammenfassung mit zwei wichtigen Knöpfen:
+   - **"Repeat today's words"** — die heute gelernten Wörter nochmal
+     üben, um sie noch besser einzuprägen.
+   - **"Start new session"** — 10 neue Wörter beginnen.
 
-**Wie das Lernsystem funktioniert:**
+**Wie die Wiederholung funktioniert:**
 
-Jedes Wort durchläuft 6 Stufen mit immer längeren Wiederhol-Intervallen:
+| Antwort | Nächste Sichtung |
+|---------|-------------------|
+| Falsch  | sehr bald wieder (~3 Karten später) |
+| 1× richtig | etwas später (~7 Karten) |
+| 2× richtig in Folge | graduiert! morgen wieder |
 
-| Stufe | Wenn richtig | Nächste Abfrage |
-|-------|-------------|------------------|
-| Neu   | → Stufe 1   | morgen          |
-| 1     | → Stufe 2   | in 3 Tagen      |
-| 2     | → Stufe 3   | in 7 Tagen      |
-| 3     | → Stufe 4   | in 14 Tagen     |
-| 4     | → Stufe 5   | in 30 Tagen     |
-| 5     | → Stufe 6   | in 90 Tagen     |
-| 6     | gemeistert! | wird als "bekannt" markiert |
+Wenn ein bereits graduiertes Wort an einem späteren Tag falsch
+beantwortet wird, fällt es zurück in die Lern-Phase und wird
+heute wieder mehrfach geübt.
 
-**Bei einer falschen Antwort** fällt das Wort zurück auf Stufe 1 und
-kommt morgen wieder dran. So vergisst du nichts.
+**Langfristige Wiederholung** (nach Graduierung):
+
+| Stufe | Nächste Abfrage |
+|-------|------------------|
+| 1     | morgen          |
+| 2     | in 3 Tagen      |
+| 3     | in 7 Tagen      |
+| 4     | in 14 Tagen     |
+| 5     | in 30 Tagen     |
+| 6     | in 90 Tagen → gemeistert (wird als "known" markiert) |
 
 **Auswahl der Wörter:**
 
-- Zuerst werden alle Wörter angezeigt, die heute fällig sind.
-- Wenn weniger als 10 fällig sind, kommen neue Wörter dazu —
-  die häufigsten im Buch zuerst (damit du beim Lesen schnell
-  Fortschritte machst).
-- Grammatikalische Partikel (wie *yang, di, ke, dan, itu*) und sehr
-  kurze Wörter werden vom Test ausgeschlossen — die lernst du beim
-  Lesen automatisch.
+- Zuerst kommen alle Wörter, die heute fällig sind (Wiederholungen).
+- Dann **Wörter, die du angefangen hast aber noch nicht graduiert sind**
+  (z.B. weil du eine Session abgebrochen hast).
+- Erst dann werden neue Wörter dazu genommen — sortiert nach Häufigkeit
+  im Buch (damit du beim Lesen schnell Fortschritte machst).
 
-**Tipp:** Mache am besten täglich eine Session. Das System sorgt dann
-selbst dafür, dass du Wörter genau dann wiederholst, wenn du sie sonst
-gerade vergessen würdest — das ist effizienter als 100 Wörter an einem
-Tag durchzupauken.
+**Was vom Test ausgeschlossen ist:**
+
+Grammatikalische Partikel wie *yang, di, ke, dan, itu* und sehr
+kurze Wörter — die lernst du beim Lesen ohnehin automatisch und
+sie wären im Test nur Lärm.
+
+**Tipp:** Mach am besten **mehrere Sessions am selben Tag**, vor allem
+am Anfang. Eine erste Session führt 10 Wörter ein, eine zweite
+Wiederholung am Abend mit "Repeat today's words" prägt sie tief ins
+Gedächtnis ein. Morgen kommen sie dann automatisch nochmal in der
+Spaced-Repetition-Wiederholung.
 
 ---
 

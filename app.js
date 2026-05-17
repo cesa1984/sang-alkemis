@@ -54,7 +54,18 @@
       const s = localStorage.getItem(STORAGE_KEYS.SETTINGS);
       if (s) settings = Object.assign(settings, JSON.parse(s));
       const sr = localStorage.getItem(STORAGE_KEYS.SRS);
-      if (sr) srsData = JSON.parse(sr);
+      if (sr) {
+        srsData = JSON.parse(sr);
+        // Migrate old entries (pre-v4): add missing `streak` field
+        let migrated = false;
+        for (const k in srsData) {
+          if (srsData[k] && typeof srsData[k].streak === 'undefined') {
+            srsData[k].streak = 0;
+            migrated = true;
+          }
+        }
+        if (migrated) saveSRS();
+      }
     } catch (e) {
       console.error('Storage load failed:', e);
     }
@@ -640,8 +651,12 @@
   // Level 0 = brand new, never reviewed (due immediately)
   // Level 1 = reviewed once correctly, next in 1 day
   // ... etc.
+  // SRS intervals for GRADUATED cards (already learned, in long-term review)
+  // Level 0 = not graduated yet (still in today's learning phase)
+  // Level 1 = graduated today, comes back tomorrow
+  // Level 2-6 = increasing intervals
   const SRS_INTERVALS_MS = [
-    0,                          // L0: immediately
+    0,                          // L0: learning phase (handled separately, not by nextDue)
     1  * 24 * 60 * 60 * 1000,   // L1: 1 day
     3  * 24 * 60 * 60 * 1000,   // L2: 3 days
     7  * 24 * 60 * 60 * 1000,   // L3: 7 days
@@ -651,26 +666,27 @@
   ];
   const SRS_MAX_LEVEL = SRS_INTERVALS_MS.length - 1;
 
-  // Indonesian grammatical particles and very common function words to EXCLUDE from test
-  // These are learned passively through reading
+  // Graduation: a NEW word needs this many correct-in-a-row in today's
+  // learning phase before it graduates to the SRS (= comes back tomorrow).
+  const GRADUATION_REQUIRED_STREAK = 2;
+
+  // Re-injection delays within a session (in card-positions ahead)
+  // After the user answers, where do we put the same card back in the queue?
+  const LEARNING_DELAY_WRONG = 3;         // wrong → very soon
+  const LEARNING_DELAY_FIRST_CORRECT = 7; // first correct → medium delay
+  const LEARNING_DELAY_LATER_CORRECT = 12;// later correct → longer delay
+
+  // Indonesian grammatical particles and very common function words to EXCLUDE
   const TEST_EXCLUDED_WORDS = new Set([
-    // Articles & determiners
     'yang', 'itu', 'ini', 'tadi', 'tu', 'nya',
-    // Prepositions
     'di', 'ke', 'dari', 'pada', 'untuk', 'oleh', 'dengan',
-    // Pronouns (common ones)
     'aku', 'ku', 'mu', 'kau', 'kamu', 'engkau', 'ia', 'dia', 'kita', 'kami', 'mereka', 'kalian',
-    // Conjunctions
     'dan', 'atau', 'tapi', 'tetapi', 'jika', 'kalau', 'karena', 'sebab', 'maka', 'jadi', 'lalu', 'kemudian',
     'ketika', 'saat', 'sebelum', 'setelah', 'sesudah', 'sambil', 'meski', 'meskipun', 'walau', 'walaupun',
     'bahwa', 'agar', 'supaya', 'sehingga', 'hingga', 'sampai',
-    // Particles
     'lah', 'kah', 'pun', 'tah',
-    // Negation
     'tidak', 'tak', 'bukan', 'jangan', 'belum',
-    // Affirmation
     'ya', 'sudah',
-    // Common short words
     'ada', 'akan', 'mau', 'bisa', 'dapat',
   ]);
 
@@ -681,15 +697,9 @@
     return true;
   }
 
-  function isSrsDue(key, now) {
-    const entry = srsData[key];
-    if (!entry) return true; // Never reviewed = due (level 0)
-    return entry.nextDue <= now;
-  }
-
   // Get all testable words with their frequency across all chapters
   function getAllTestableWordsByFrequency() {
-    const freq = new Map(); // key -> { count: N, display: id }
+    const freq = new Map();
     Object.values(chapters).forEach(ch => {
       (ch.tokens || []).forEach(sentence => {
         if (typeof sentence !== 'object' || !sentence || !sentence.t) return;
@@ -705,44 +715,8 @@
       });
     });
     const arr = Array.from(freq.values());
-    arr.sort((a, b) => b.count - a.count); // Most frequent first
+    arr.sort((a, b) => b.count - a.count);
     return arr;
-  }
-
-  // Determine the queue of 10 words for a test session
-  function buildTestQueue(sessionSize = 10) {
-    const now = Date.now();
-    const allWords = getAllTestableWordsByFrequency();
-
-    // Step 1: Find words that are DUE for review (level > 0, nextDue <= now)
-    const dueReviews = allWords.filter(w => {
-      const entry = srsData[w.key];
-      return entry && entry.nextDue <= now;
-    });
-
-    // Step 2: New words (no SRS entry yet), sorted by frequency
-    const newWords = allWords.filter(w => !srsData[w.key]);
-
-    // Build queue: prioritize due reviews, fill with new words
-    const queue = [];
-    let newWordsAdded = 0;
-
-    // Add due reviews first (in random order)
-    const shuffledDue = shuffle(dueReviews.map(w => w.key));
-    for (const k of shuffledDue) {
-      if (queue.length >= sessionSize) break;
-      queue.push(k);
-    }
-
-    // Fill remaining slots with new words (in frequency order)
-    for (const w of newWords) {
-      if (queue.length >= sessionSize) break;
-      queue.push(w.key);
-      newWordsAdded++;
-    }
-
-    // Shuffle the final queue so reviews and new words are mixed
-    return { queue: shuffle(queue), newWordsAdded };
   }
 
   function shuffle(arr) {
@@ -754,29 +728,113 @@
     return a;
   }
 
-  function srsReview(key, knew) {
-    const now = Date.now();
-    let entry = srsData[key];
-    if (!entry) {
-      entry = { level: 0, nextDue: 0, lastReviewed: 0, correctCount: 0, wrongCount: 0 };
+  // Get/create an SRS entry. New entries start with level=0 (learning phase).
+  function getSrsEntry(key) {
+    if (!srsData[key]) {
+      srsData[key] = {
+        level: 0,           // 0 = learning phase, 1-6 = graduated SRS
+        streak: 0,          // consecutive correct in current learning phase
+        nextDue: 0,         // when (timestamp ms) it's due again for graduated cards
+        lastReviewed: 0,
+        correctCount: 0,
+        wrongCount: 0,
+      };
     }
-    entry.lastReviewed = now;
-    if (knew) {
-      entry.correctCount = (entry.correctCount || 0) + 1;
-      entry.level = Math.min(entry.level + 1, SRS_MAX_LEVEL);
-    } else {
-      entry.wrongCount = (entry.wrongCount || 0) + 1;
-      entry.level = 1; // Reset to "tomorrow" (level 1 = 1 day)
-    }
-    entry.nextDue = now + SRS_INTERVALS_MS[entry.level];
-    srsData[key] = entry;
+    return srsData[key];
+  }
 
-    // Once a word reaches max level (90 days = mastered), also mark as "known" in dictionary
-    if (entry.level >= SRS_MAX_LEVEL) {
-      progress[key] = 'known';
-      saveProgress();
+  // Pick up to N words for a new session.
+  // Priorities:
+  //  1. Words due for SRS review (graduated, level>=1, nextDue<=now) - randomized
+  //  2. Words currently in learning phase (level=0, already started) - randomized
+  //  3. New words (no entry yet) - by frequency
+  function pickSessionWords(sessionSize = 10) {
+    const now = Date.now();
+    const allWords = getAllTestableWordsByFrequency();
+
+    const dueGraduated = [];
+    const inLearning = [];
+    const brandNew = [];
+
+    for (const w of allWords) {
+      const e = srsData[w.key];
+      if (!e) {
+        brandNew.push(w);
+      } else if (e.level === 0) {
+        inLearning.push(w);
+      } else if (e.nextDue <= now) {
+        dueGraduated.push(w);
+      }
     }
-    saveSRS();
+
+    const picks = [];
+
+    // Add due graduated (shuffled) up to limit
+    const shuffledDue = shuffle(dueGraduated);
+    for (const w of shuffledDue) {
+      if (picks.length >= sessionSize) break;
+      picks.push(w.key);
+    }
+    // Add in-learning words (shuffled) up to limit
+    const shuffledLearning = shuffle(inLearning);
+    for (const w of shuffledLearning) {
+      if (picks.length >= sessionSize) break;
+      picks.push(w.key);
+    }
+    // Fill with brand new (in frequency order)
+    for (const w of brandNew) {
+      if (picks.length >= sessionSize) break;
+      picks.push(w.key);
+    }
+
+    return picks;
+  }
+
+  // Within-session re-injection: when user answers a card during the
+  // learning phase, decide where to put it back in the queue (or remove it).
+  function reinjectCard(session, key, knew) {
+    const entry = getSrsEntry(key);
+
+    if (entry.level >= 1) {
+      // GRADUATED card being reviewed today
+      if (knew) {
+        // Promote level, schedule next due far in the future
+        entry.level = Math.min(entry.level + 1, SRS_MAX_LEVEL);
+        entry.nextDue = Date.now() + SRS_INTERVALS_MS[entry.level];
+        // Done with this card for this session
+        if (entry.level >= SRS_MAX_LEVEL) {
+          progress[key] = 'known';
+          saveProgress();
+        }
+        return null; // remove from queue
+      } else {
+        // Demote back to learning phase
+        entry.level = 0;
+        entry.streak = 0;
+        entry.nextDue = 0;
+        // Re-inject soon
+        return LEARNING_DELAY_WRONG;
+      }
+    } else {
+      // LEARNING phase (level 0)
+      if (knew) {
+        entry.streak = (entry.streak || 0) + 1;
+        if (entry.streak >= GRADUATION_REQUIRED_STREAK) {
+          // Graduate! Move to level 1 (due tomorrow)
+          entry.level = 1;
+          entry.streak = 0;
+          entry.nextDue = Date.now() + SRS_INTERVALS_MS[1];
+          // Mark as graduated in this session
+          session.graduatedKeys.add(key);
+          return null; // remove from queue
+        }
+        // Not yet graduated - put it back, further away
+        return entry.streak === 1 ? LEARNING_DELAY_FIRST_CORRECT : LEARNING_DELAY_LATER_CORRECT;
+      } else {
+        entry.streak = 0; // reset streak
+        return LEARNING_DELAY_WRONG;
+      }
+    }
   }
 
   // ============================================================
@@ -794,28 +852,31 @@
     document.getElementById('test-summary').classList.add('hidden');
     document.getElementById('test-progress').textContent = '';
 
-    // Show status: how many are due, how many new, how many mastered
     const now = Date.now();
     const allWords = getAllTestableWordsByFrequency();
     const dueCount = allWords.filter(w => {
       const e = srsData[w.key];
-      return e && e.nextDue <= now;
+      return e && e.level >= 1 && e.nextDue <= now;
     }).length;
     const newCount = allWords.filter(w => !srsData[w.key]).length;
+    const learningCount = allWords.filter(w => {
+      const e = srsData[w.key];
+      return e && e.level === 0;
+    }).length;
     const masteredCount = allWords.filter(w => {
       const e = srsData[w.key];
       return e && e.level >= SRS_MAX_LEVEL;
     }).length;
-    const learningCount = allWords.filter(w => {
+    const reviewingCount = allWords.filter(w => {
       const e = srsData[w.key];
-      return e && e.level < SRS_MAX_LEVEL && e.level > 0;
+      return e && e.level >= 1 && e.level < SRS_MAX_LEVEL;
     }).length;
 
     let nextDueText = '';
-    if (dueCount === 0 && newCount === 0) {
+    if (dueCount === 0 && newCount === 0 && learningCount === 0) {
       const future = allWords
         .map(w => srsData[w.key])
-        .filter(e => e && e.nextDue > now)
+        .filter(e => e && e.level >= 1 && e.nextDue > now)
         .sort((a, b) => a.nextDue - b.nextDue);
       if (future.length > 0) {
         const nextMs = future[0].nextDue - now;
@@ -830,13 +891,14 @@
 
     document.getElementById('test-status-info').innerHTML = `
       <span class="stat-line"><b>${dueCount}</b> word${dueCount === 1 ? '' : 's'} due for review</span>
+      <span class="stat-line"><b>${learningCount}</b> currently learning (in progress)</span>
       <span class="stat-line"><b>${newCount}</b> new word${newCount === 1 ? '' : 's'} ready to learn</span>
-      <span class="stat-line"><b>${learningCount}</b> learning · <b>${masteredCount}</b> mastered · <b>${totalTestable}</b> total</span>
+      <span class="stat-line"><b>${reviewingCount}</b> reviewing · <b>${masteredCount}</b> mastered · <b>${totalTestable}</b> total</span>
       ${nextDueText ? `<span class="stat-line" style="margin-top:0.5rem">${nextDueText}</span>` : ''}
     `;
 
     const beginBtn = document.getElementById('test-begin-btn');
-    if (dueCount === 0 && newCount === 0) {
+    if (dueCount === 0 && newCount === 0 && learningCount === 0) {
       beginBtn.disabled = true;
       beginBtn.textContent = 'Nothing to review';
       beginBtn.style.opacity = '0.5';
@@ -849,18 +911,54 @@
     }
   }
 
-  function beginTestSession() {
-    const { queue, newWordsAdded } = buildTestQueue(10);
-    if (queue.length === 0) {
+  // Begin a new session.
+  // mode = 'auto' (default): pick new/due words
+  // mode = 'repeat': use the same word set as last session (today's words again)
+  function beginTestSession(mode) {
+    let initialWords;
+    if (mode === 'repeat' && testSession && testSession.initialWords && testSession.initialWords.length > 0) {
+      // Reset learning state for these words so user can practice them again
+      initialWords = testSession.initialWords.slice();
+      for (const k of initialWords) {
+        const e = srsData[k];
+        if (e) {
+          e.streak = 0;
+          // If it had graduated (level 1), demote to learning so it'll be repeated
+          if (e.level === 1) {
+            e.level = 0;
+            e.nextDue = 0;
+          }
+        }
+      }
+      saveSRS();
+    } else {
+      initialWords = pickSessionWords(10);
+    }
+
+    if (initialWords.length === 0) {
       toast('No words to test. Read more first!');
       return;
     }
+
+    // Count how many of these are brand new (never seen) BEFORE creating entries
+    let newWordsAdded = 0;
+    for (const k of initialWords) {
+      if (!srsData[k]) newWordsAdded++;
+      // Initialize entries for new words
+      getSrsEntry(k);
+    }
+    saveSRS();
+
     testSession = {
-      queue: queue,
+      initialWords: initialWords.slice(),  // The 10 we started with (preserved)
+      queue: shuffle(initialWords.slice()),// Working queue, gets re-injected
       currentIdx: 0,
-      results: [],
+      results: [],                          // every answer in order
+      uniqueAnswered: new Set(),           // unique keys reviewed
       totalCorrect: 0,
+      totalAnswers: 0,
       newWords: newWordsAdded,
+      graduatedKeys: new Set(),            // keys graduated this session
       startedAt: Date.now(),
     };
     showCurrentCard();
@@ -878,17 +976,20 @@
     document.getElementById('test-summary').classList.add('hidden');
     document.getElementById('test-card-screen').classList.remove('hidden');
 
+    // Progress: how many UNIQUE words have graduated/completed out of initial 10
+    const completed = testSession.graduatedKeys.size;
+    const total = testSession.initialWords.length;
     document.getElementById('test-progress').textContent =
-      `${idx + 1} / ${testSession.queue.length}`;
+      `${completed} / ${total} learned`;
 
     const key = testSession.queue[idx];
     const entry = findDictEntryByKey(key);
 
-    // Reset card to front
     const card = document.getElementById('test-card');
     card.classList.remove('revealed');
     document.getElementById('test-card-back').classList.add('hidden');
     document.getElementById('test-actions').classList.add('hidden');
+    card.querySelector('.test-card-front').style.display = '';
 
     document.getElementById('test-word-id').textContent = entry ? entry.display : key;
     document.getElementById('test-word-id-small').textContent = entry ? entry.display : key;
@@ -918,21 +1019,39 @@
     card.classList.add('revealed');
     document.getElementById('test-card-back').classList.remove('hidden');
     document.getElementById('test-actions').classList.remove('hidden');
-    // Hide the front content (word ID is shown small at top of back)
-    document.getElementById('test-card').querySelector('.test-card-front').style.display = 'none';
+    card.querySelector('.test-card-front').style.display = 'none';
   }
 
   function answerCard(knew) {
     if (!testSession) return;
-    const key = testSession.queue[testSession.currentIdx];
-    srsReview(key, knew);
-    testSession.results.push({ key, knew });
+    const idx = testSession.currentIdx;
+    if (idx >= testSession.queue.length) return;
+
+    const key = testSession.queue[idx];
+    const entry = getSrsEntry(key);
+    entry.lastReviewed = Date.now();
+    if (knew) entry.correctCount++;
+    else entry.wrongCount++;
+
+    testSession.uniqueAnswered.add(key);
+    testSession.totalAnswers++;
     if (knew) testSession.totalCorrect++;
-    testSession.currentIdx++;
+    testSession.results.push({ key, knew, time: Date.now() });
 
-    // Restore front display for next card
-    document.getElementById('test-card').querySelector('.test-card-front').style.display = '';
+    const delay = reinjectCard(testSession, key, knew);
 
+    // Remove current card from queue
+    testSession.queue.splice(idx, 1);
+
+    if (delay !== null) {
+      // Re-insert further down
+      const insertAt = Math.min(idx + delay, testSession.queue.length);
+      testSession.queue.splice(insertAt, 0, key);
+    }
+
+    saveSRS();
+
+    // currentIdx stays the same (we removed the current one; next card slides into idx)
     setTimeout(() => showCurrentCard(), 200);
   }
 
@@ -941,32 +1060,56 @@
     document.getElementById('test-summary').classList.remove('hidden');
     document.getElementById('test-progress').textContent = '';
 
-    const total = testSession.queue.length;
+    const totalAnswers = testSession.totalAnswers;
     const correct = testSession.totalCorrect;
-    const wrong = total - correct;
-    const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
+    const wrong = totalAnswers - correct;
+    const pct = totalAnswers > 0 ? Math.round((correct / totalAnswers) * 100) : 0;
 
-    // Count how many words got newly mastered this session
-    const masteredNow = testSession.results.filter(r => {
-      const e = srsData[r.key];
-      return e && e.level >= SRS_MAX_LEVEL;
-    }).length;
+    const graduatedCount = testSession.graduatedKeys.size;
+    const totalInitial = testSession.initialWords.length;
+    const allGraduated = graduatedCount >= totalInitial;
 
     document.getElementById('test-summary-stats').innerHTML = `
-      <span class="big-num">${correct} / ${total}</span>
-      <span class="label">${pct}% correct</span>
+      <span class="big-num">${graduatedCount} / ${totalInitial}</span>
+      <span class="label">words learned today</span>
       <div class="row">
+        <div>
+          <span class="big-num" style="font-size:1.8rem">${totalAnswers}</span>
+          <span class="label">cards answered (${pct}% correct)</span>
+        </div>
         <div>
           <span class="big-num" style="font-size:1.8rem">${testSession.newWords}</span>
           <span class="label">new words introduced</span>
         </div>
-        <div>
-          <span class="big-num" style="font-size:1.8rem">${wrong}</span>
-          <span class="label">to review tomorrow</span>
-        </div>
       </div>
-      ${masteredNow > 0 ? `<div style="margin-top:1rem;color:var(--success);font-style:italic">✦ ${masteredNow} word${masteredNow === 1 ? '' : 's'} mastered!</div>` : ''}
+      ${allGraduated
+        ? `<div style="margin-top:1rem;color:var(--success);font-style:italic">✦ All ${totalInitial} words graduated! Come back tomorrow to review them.</div>`
+        : `<div style="margin-top:1rem;color:var(--ink-soft);font-style:italic">${totalInitial - graduatedCount} word${totalInitial - graduatedCount === 1 ? ' is' : 's are'} still in learning. Continue this session to graduate them.</div>`
+      }
     `;
+
+    // Configure summary buttons based on session state
+    const restartBtn = document.getElementById('test-restart-btn');
+    const finishBtn = document.getElementById('test-finish-btn');
+    const repeatBtn = document.getElementById('test-repeat-btn');
+
+    if (allGraduated) {
+      // All words graduated → main option is to repeat them, secondary is new session
+      restartBtn.textContent = 'Start new session';
+      restartBtn.classList.remove('primary');
+      restartBtn.classList.add('action-btn');
+      if (repeatBtn) {
+        repeatBtn.style.display = '';
+        repeatBtn.classList.add('primary');
+      }
+    } else {
+      // Some still in learning → main option is continue (which is restart with same)
+      restartBtn.textContent = "Continue with today's words";
+      restartBtn.classList.add('primary');
+      if (repeatBtn) {
+        repeatBtn.style.display = 'none';
+      }
+    }
   }
 
   // ============================================================
@@ -1064,12 +1207,11 @@
   // Test view bindings
   document.getElementById('test-start-btn').addEventListener('click', openTestView);
   document.getElementById('test-back-btn').addEventListener('click', () => {
-    // If user backs out mid-session, just save and return - SRS state is already saved per-card
     testSession = null;
     showView('dict-view');
   });
   document.getElementById('test-begin-btn').addEventListener('click', () => {
-    if (!document.getElementById('test-begin-btn').disabled) beginTestSession();
+    if (!document.getElementById('test-begin-btn').disabled) beginTestSession('auto');
   });
   document.getElementById('test-card').addEventListener('click', revealCard);
   document.getElementById('test-right-btn').addEventListener('click', (e) => {
@@ -1081,8 +1223,20 @@
     answerCard(false);
   });
   document.getElementById('test-restart-btn').addEventListener('click', () => {
-    renderTestStart();
-    beginTestSession();
+    // If some words from current session are not yet graduated, continue with same.
+    // Otherwise start a fresh session with new words.
+    if (testSession) {
+      const graduated = testSession.graduatedKeys.size;
+      const total = testSession.initialWords.length;
+      if (graduated < total) {
+        beginTestSession('repeat');
+        return;
+      }
+    }
+    beginTestSession('auto');
+  });
+  document.getElementById('test-repeat-btn').addEventListener('click', () => {
+    beginTestSession('repeat');
   });
   document.getElementById('test-finish-btn').addEventListener('click', () => {
     testSession = null;
