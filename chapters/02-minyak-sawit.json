@@ -1,0 +1,671 @@
+{
+  "id": "02-minyak-sawit",
+  "number": "BAB DUA",
+  "title": "Minyak Sawit: Dari Kebun ke Pasar Dunia",
+  "language": "id",
+  "tokens": [
+    {
+      "en": "Palm oil is one of the most important agricultural commodities in the world.",
+      "t": [
+        ["Minyak", "oil"], ["sawit", "palm"], ["adalah", "is"],
+        ["salah", "one-of (idiom)"], ["satu", "one-of (idiom)"],
+        ["komoditas", "commodity"], ["pertanian", "agricultural"], ["yang", "that-is"],
+        ["paling", "most"], ["penting", "important"], ["di", "in"], ["dunia", "the-world"], "."
+      ]
+    },
+    {
+      "en": "This oil is produced from the fruit of the oil palm tree, whose Latin name is Elaeis guineensis.",
+      "t": [
+        ["Minyak", "oil"], ["ini", "this"], ["dihasilkan", "is-produced"], ["dari", "from"],
+        ["buah", "fruit"], ["pohon", "tree"], ["kelapa", "palm"], ["sawit", "oil"], ",",
+        ["yang", "whose"], ["nama", "name"], ["latinnya", "Latin-its"], ["adalah", "is"],
+        ["Elaeis", "Elaeis"], ["guineensis", "guineensis"], "."
+      ]
+    },
+    {
+      "en": "Originally, this plant came from West Africa.",
+      "t": [
+        ["Awalnya", "originally"], ",", ["tanaman", "plant"], ["ini", "this"],
+        ["berasal", "originated"], ["dari", "from"], ["Afrika", "Africa"], ["Barat", "West"], "."
+      ]
+    },
+    {
+      "en": "However, today Indonesia and Malaysia are the largest producers in the world.",
+      "t": [
+        ["Namun", "however"], ",", ["sekarang", "today"], ["Indonesia", "Indonesia"],
+        ["dan", "and"], ["Malaysia", "Malaysia"], ["adalah", "are"], ["produsen", "producers"],
+        ["terbesar", "the-largest"], ["di", "in"], ["dunia", "the-world"], "."
+      ]
+    },
+    {
+      "en": "These two countries produce approximately 85 percent of the world's palm oil supply.",
+      "t": [
+        ["Kedua", "the-two"], ["negara", "countries"], ["ini", "these"],
+        ["menghasilkan", "produce"], ["kira-kira", "approximately"],
+        ["delapan", "eight"], ["puluh", "ten"], ["lima", "five"], ["persen", "percent"],
+        ["dari", "of"], ["pasokan", "supply"], ["minyak", "oil"], ["sawit", "palm"],
+        ["dunia", "world"], "."
+      ]
+    },
+    {
+      "en": "Palm oil is used in food, cosmetics, soap, and even biofuel.",
+      "t": [
+        ["Minyak", "oil"], ["sawit", "palm"], ["digunakan", "is-used"],
+        ["dalam", "in"], ["makanan", "food"], ",", ["kosmetik", "cosmetics"], ",",
+        ["sabun", "soap"], ",", ["bahkan", "even"],
+        ["bahan", "material"], ["bakar", "fuel"], ["hayati", "bio"], "."
+      ]
+    },
+    "PARA",
+    {
+      "en": "The oil palm grows well in tropical regions near the equator.",
+      "t": [
+        ["Pohon", "tree"], ["kelapa", "palm"], ["sawit", "oil"],
+        ["tumbuh", "grows"], ["dengan", "with"], ["baik", "good"],
+        ["di", "in"], ["daerah", "regions"], ["tropis", "tropical"],
+        ["dekat", "near"], ["khatulistiwa", "the-equator"], "."
+      ]
+    },
+    {
+      "en": "This plant requires warm temperatures, high rainfall, and abundant sunlight.",
+      "t": [
+        ["Tanaman", "plant"], ["ini", "this"], ["membutuhkan", "requires"],
+        ["suhu", "temperature"], ["yang", "that-is"], ["hangat", "warm"], ",",
+        ["curah", "rate"], ["hujan", "rainfall"], ["yang", "that-is"], ["tinggi", "high"], ",",
+        ["dan", "and"], ["sinar", "light"], ["matahari", "of-the-sun"],
+        ["yang", "that-is"], ["melimpah", "abundant"], "."
+      ]
+    },
+    {
+      "en": "In Indonesia, the largest plantations are located on the islands of Sumatra and Kalimantan.",
+      "t": [
+        ["Di", "in"], ["Indonesia", "Indonesia"], ",", ["perkebunan", "plantations"],
+        ["terbesar", "largest"], ["terletak", "are-located"],
+        ["di", "on"], ["pulau", "islands"], ["Sumatra", "Sumatra"],
+        ["dan", "and"], ["Kalimantan", "Kalimantan"], "."
+      ]
+    },
+    {
+      "en": "An oil palm tree begins to bear fruit at the age of three or four years.",
+      "t": [
+        ["Pohon", "tree"], ["kelapa", "palm"], ["sawit", "oil"],
+        ["mulai", "begins"], ["berbuah", "to-bear-fruit"],
+        ["pada", "at"], ["umur", "age"], ["tiga", "three"],
+        ["atau", "or"], ["empat", "four"], ["tahun", "years"], "."
+      ]
+    },
+    {
+      "en": "Its productive period can reach 25 to 30 years.",
+      "t": [
+        ["Masa", "period"], ["produktifnya", "productive-its"],
+        ["bisa", "can"], ["mencapai", "reach"],
+        ["dua", "two"], ["puluh", "ten"], ["lima", "five"],
+        ["sampai", "to"], ["tiga", "three"], ["puluh", "ten"], ["tahun", "years"], "."
+      ]
+    },
+    {
+      "en": "The fruit grows in large bunches that usually weigh between 10 and 25 kilograms.",
+      "t": [
+        ["Buah", "fruit"], ["tumbuh", "grows"], ["dalam", "in"],
+        ["tandan", "bunches"], ["besar", "large"],
+        ["yang", "that"], ["biasanya", "usually"], ["seberat", "weigh-as-much-as"],
+        ["sepuluh", "ten"], ["sampai", "to"],
+        ["dua", "two"], ["puluh", "ten"], ["lima", "five"], ["kilogram", "kilograms"], "."
+      ]
+    },
+    {
+      "en": "Every bunch contains between one thousand and two thousand small fruits.",
+      "t": [
+        ["Setiap", "every"], ["tandan", "bunch"], ["berisi", "contains"],
+        ["antara", "between"], ["seribu", "one-thousand"],
+        ["sampai", "and"], ["dua", "two"], ["ribu", "thousand"],
+        ["buah", "fruits"], ["kecil", "small"], "."
+      ]
+    },
+    {
+      "en": "For short trees, workers use a chisel-like tool called a 'dodos'.",
+      "t": [
+        ["Untuk", "for"], ["pohon", "trees"], ["yang", "that-are"],
+        ["pendek", "short"], ",", ["pekerja", "workers"],
+        ["menggunakan", "use"], ["alat", "tool"],
+        ["seperti", "like"], ["pahat", "chisel"],
+        ["yang", "that-is"], ["disebut", "called"],
+        "\u201C", ["dodos", "dodos"], "\u201D", "."
+      ]
+    },
+    {
+      "en": "For taller trees, a sickle attached to a long pole, called an 'egrek', is used.",
+      "t": [
+        ["Untuk", "for"], ["pohon", "trees"], ["yang", "that-are"],
+        ["lebih", "more"], ["tinggi", "tall"], ",",
+        ["digunakan", "is-used"], ["sabit", "sickle"],
+        ["yang", "that-is"], ["dipasang", "attached"],
+        ["pada", "to"], ["galah", "pole"], ["panjang", "long"], ",",
+        ["yang", "that-is"], ["disebut", "called"],
+        "\u201C", ["egrek", "egrek"], "\u201D", "."
+      ]
+    },
+    {
+      "en": "This work is very heavy because the fruit must be cut from a great height.",
+      "t": [
+        ["Pekerjaan", "work"], ["ini", "this"], ["sangat", "very"], ["berat", "heavy"],
+        ["karena", "because"], ["buah", "fruit"], ["harus", "must"],
+        ["dipotong", "be-cut"], ["dari", "from"], ["ketinggian", "height"],
+        ["yang", "that-is"], ["besar", "great"], "."
+      ]
+    },
+    {
+      "en": "After being cut, the fruit bunches are gathered and transported to the mill.",
+      "t": [
+        ["Setelah", "after"], ["dipotong", "being-cut"], ",",
+        ["tandan", "bunches"], ["buah", "fruit"], ["dikumpulkan", "are-gathered"],
+        ["dan", "and"], ["diangkut", "transported"],
+        ["ke", "to"], ["pabrik", "the-mill"], "."
+      ]
+    },
+    {
+      "en": "Speed is very important here, because the fruit will quickly decline in quality.",
+      "t": [
+        ["Kecepatan", "speed"], ["sangat", "very"], ["penting", "important"], ["di", "at"],
+        ["sini", "here"], ",", ["karena", "because"], ["buah", "fruit"],
+        ["akan", "will"], ["cepat", "quickly"], ["menurun", "decline"],
+        ["mutunya", "its-quality"], "."
+      ]
+    },
+    {
+      "en": "Ideally, the fruit is processed within 24 hours after harvest.",
+      "t": [
+        ["Idealnya", "ideally"], ",", ["buah", "fruit"], ["diproses", "is-processed"],
+        ["dalam", "within"], ["waktu", "time"],
+        ["dua", "two"], ["puluh", "ten"], ["empat", "four"], ["jam", "hours"],
+        ["setelah", "after"], ["panen", "harvest"], "."
+      ]
+    },
+    "PARA",
+    {
+      "en": "At the mill, the fruit goes through several processing stages.",
+      "t": [
+        ["Di", "at"], ["pabrik", "the-mill"], ",", ["buah", "the-fruit"],
+        ["melalui", "goes-through"], ["beberapa", "several"],
+        ["tahap", "stages"], ["pengolahan", "of-processing"], "."
+      ]
+    },
+    {
+      "en": "The first stage is called 'sterilization'.",
+      "t": [
+        ["Tahap", "stage"], ["pertama", "first"], ["disebut", "is-called"],
+        "\u201C", ["sterilisasi", "sterilization"], "\u201D", "."
+      ]
+    },
+    {
+      "en": "The fruit bunches are heated with high-pressure steam for about 90 minutes.",
+      "t": [
+        ["Tandan", "bunches"], ["buah", "fruit"], ["dipanaskan", "are-heated"],
+        ["dengan", "with"], ["uap", "steam"], ["bertekanan", "of-pressure"],
+        ["tinggi", "high"],
+        ["selama", "for"], ["sekitar", "about"],
+        ["sembilan", "nine"], ["puluh", "ten"], ["menit", "minutes"], "."
+      ]
+    },
+    {
+      "en": "This process kills the enzymes that damage the oil and loosens the fruit from the bunch.",
+      "t": [
+        ["Proses", "process"], ["ini", "this"], ["mematikan", "kills"],
+        ["enzim", "enzymes"], ["yang", "that"],
+        ["merusak", "damage"], ["minyak", "the-oil"],
+        ["dan", "and"], ["melepaskan", "loosens"],
+        ["buah", "the-fruit"], ["dari", "from"], ["tandan", "the-bunch"], "."
+      ]
+    },
+    {
+      "en": "After that, the fruit is separated from the empty bunch in a machine called a 'thresher'.",
+      "t": [
+        ["Setelah", "after"], ["itu", "that"], ",",
+        ["buah", "the-fruit"], ["dipisahkan", "is-separated"],
+        ["dari", "from"], ["tandan", "bunch"], ["kosong", "empty"],
+        ["di", "in"], ["mesin", "a-machine"], ["yang", "that-is"],
+        ["disebut", "called"], "\u201C", ["thresher", "thresher"], "\u201D", "."
+      ]
+    },
+    {
+      "en": "Next, the fruit is mashed in a 'digester' which uses rotating blades.",
+      "t": [
+        ["Selanjutnya", "next"], ",",
+        ["buah", "the-fruit"], ["dilumatkan", "is-mashed"],
+        ["dalam", "in"], "\u201C", ["digester", "digester"], "\u201D",
+        ["yang", "which"], ["menggunakan", "uses"],
+        ["pisau", "blades"], ["berputar", "rotating"], "."
+      ]
+    },
+    {
+      "en": "The mashed fruit is then pressed to extract crude oil.",
+      "t": [
+        ["Buah", "fruit"], ["yang", "that-has-been"], ["dilumat", "mashed"],
+        ["kemudian", "then"], ["dipres", "is-pressed"],
+        ["untuk", "to"], ["mengeluarkan", "extract"],
+        ["minyak", "oil"], ["mentah", "crude"], "."
+      ]
+    },
+    {
+      "en": "This raw oil is called CPO, or 'Crude Palm Oil'.",
+      "t": [
+        ["Minyak", "oil"], ["mentah", "crude"], ["ini", "this"],
+        ["disebut", "is-called"], ["CPO", "CPO"], ",", ["atau", "or"],
+        "\u201C", ["Crude", "crude"], ["Palm", "palm"], ["Oil", "oil"], "\u201D", "."
+      ]
+    },
+    {
+      "en": "CPO has a reddish color because of its high content of carotene.",
+      "t": [
+        ["CPO", "CPO"], ["memiliki", "has"], ["warna", "color"],
+        ["kemerahan", "reddish"], ["karena", "because-of"],
+        ["kandungan", "content"], ["karotennya", "carotene-its"],
+        ["yang", "that-is"], ["tinggi", "high"], "."
+      ]
+    },
+    {
+      "en": "The seed inside the fruit, called the 'kernel', is also processed separately.",
+      "t": [
+        ["Biji", "seed"], ["di", "in"], ["dalam", "inside"], ["buah", "the-fruit"], ",",
+        ["yang", "that-is"], ["disebut", "called"],
+        "\u201C", ["inti", "kernel"], "\u201D", ",",
+        ["juga", "also"], ["diolah", "is-processed"],
+        ["secara", "in-a-manner"], ["terpisah", "separate"], "."
+      ]
+    },
+    {
+      "en": "From the kernel, palm kernel oil or 'PKO' is produced.",
+      "t": [
+        ["Dari", "from"], ["inti", "kernel"], ["dihasilkan", "is-produced"],
+        ["minyak", "oil"], ["inti", "kernel"], ["sawit", "palm"],
+        ["atau", "or"], "\u201C", ["PKO", "PKO"], "\u201D", "."
+      ]
+    },
+    {
+      "en": "So one fruit produces two different kinds of oil.",
+      "t": [
+        ["Jadi", "so"], ",", ["satu", "one"], ["buah", "fruit"],
+        ["menghasilkan", "produces"], ["dua", "two"],
+        ["jenis", "kinds"], ["minyak", "of-oil"],
+        ["yang", "that-are"], ["berbeda", "different"], "."
+      ]
+    },
+    "PARA",
+    {
+      "en": "CPO that has just left the mill is not yet ready for consumption.",
+      "t": [
+        ["CPO", "CPO"], ["yang", "that"], ["baru", "just"],
+        ["keluar", "left"], ["dari", "from"], ["pabrik", "the-mill"],
+        ["belum", "not-yet"], ["siap", "ready"],
+        ["untuk", "for"], ["dikonsumsi", "being-consumed"], "."
+      ]
+    },
+    {
+      "en": "This oil must go through a refining process at the refinery.",
+      "t": [
+        ["Minyak", "oil"], ["ini", "this"], ["harus", "must"],
+        ["melalui", "go-through"], ["proses", "process"],
+        ["penyulingan", "of-refining"], ["di", "at"],
+        ["kilang", "refinery"], "."
+      ]
+    },
+    {
+      "en": "There are three main stages in refining: degumming, bleaching, and deodorization.",
+      "t": [
+        ["Ada", "there-are"], ["tiga", "three"],
+        ["tahap", "stages"], ["utama", "main"],
+        ["dalam", "in"], ["penyulingan", "refining"], ":",
+        ["degumming", "degumming"], ",",
+        ["pemutihan", "bleaching"], ",",
+        ["dan", "and"], ["penghilangan", "removal"], ["bau", "of-smell"], "."
+      ]
+    },
+    {
+      "en": "Degumming removes the gum and impurities from the oil.",
+      "t": [
+        ["Degumming", "degumming"], ["menghilangkan", "removes"],
+        ["getah", "gum"], ["dan", "and"], ["kotoran", "impurities"],
+        ["dari", "from"], ["minyak", "the-oil"], "."
+      ]
+    },
+    {
+      "en": "Bleaching uses special clay to absorb color and other impurities.",
+      "t": [
+        ["Pemutihan", "bleaching"], ["menggunakan", "uses"],
+        ["tanah", "clay"], ["liat", "earth/sticky"],
+        ["khusus", "special"], ["untuk", "to"],
+        ["menyerap", "absorb"], ["warna", "color"],
+        ["dan", "and"], ["kotoran", "impurities"], ["lain", "other"], "."
+      ]
+    },
+    {
+      "en": "Deodorization is carried out with steam at very high temperatures.",
+      "t": [
+        ["Penghilangan", "removal"], ["bau", "of-smell"],
+        ["dilakukan", "is-carried-out"], ["dengan", "with"],
+        ["uap", "steam"], ["pada", "at"], ["suhu", "temperature"],
+        ["yang", "that-is"], ["sangat", "very"], ["tinggi", "high"], "."
+      ]
+    },
+    {
+      "en": "The result of refining is called 'RBD palm oil', which means refined, bleached, and deodorized.",
+      "t": [
+        ["Hasil", "result"], ["penyulingan", "of-refining"],
+        ["disebut", "is-called"], "\u201C", ["RBD", "RBD"], ["palm", "palm"], ["oil", "oil"], "\u201D", ",",
+        ["yang", "which"], ["berarti", "means"],
+        ["dimurnikan", "refined"], ",", ["diputihkan", "bleached"], ",",
+        ["dan", "and"], ["dihilangkan", "deodorized"], ["baunya", "its-smell"], "."
+      ]
+    },
+    {
+      "en": "After refining, the oil goes through a separate process called fractionation.",
+      "t": [
+        ["Setelah", "after"], ["penyulingan", "refining"], ",",
+        ["minyak", "the-oil"], ["melalui", "goes-through"],
+        ["proses", "process"], ["terpisah", "separate"],
+        ["yang", "that-is"], ["disebut", "called"],
+        ["fraksinasi", "fractionation"], "."
+      ]
+    },
+    {
+      "en": "In fractionation, the oil is cooled in a controlled way so that it separates into two parts: olein (liquid) and stearin (solid).",
+      "t": [
+        ["Dalam", "in"], ["fraksinasi", "fractionation"], ",",
+        ["minyak", "the-oil"], ["didinginkan", "is-cooled"],
+        ["secara", "in-a-manner"], ["terkendali", "controlled"],
+        ["sehingga", "so-that"], ["terpisah", "it-separates"],
+        ["menjadi", "into"], ["dua", "two"], ["bagian", "parts"], ":",
+        ["olein", "olein"],
+        "(", ["cair", "liquid"], ")",
+        ["dan", "and"], ["stearin", "stearin"],
+        "(", ["padat", "solid"], ")", "."
+      ]
+    },
+    {
+      "en": "Olein is used as cooking oil, while stearin is used for margarine and soap.",
+      "t": [
+        ["Olein", "olein"], ["digunakan", "is-used"],
+        ["sebagai", "as"], ["minyak", "oil"], ["goreng", "for-frying"], ",",
+        ["sedangkan", "while"], ["stearin", "stearin"],
+        ["digunakan", "is-used"], ["untuk", "for"],
+        ["margarin", "margarine"], ["dan", "and"], ["sabun", "soap"], "."
+      ]
+    },
+    "PARA",
+    {
+      "en": "Indonesia is the largest exporter of palm oil in the world.",
+      "t": [
+        ["Indonesia", "Indonesia"], ["adalah", "is"],
+        ["pengekspor", "exporter"], ["minyak", "of-oil"], ["sawit", "palm"],
+        ["terbesar", "largest"], ["di", "in"], ["dunia", "the-world"], "."
+      ]
+    },
+    {
+      "en": "Each year, Indonesia produces around 45 to 50 million tons of CPO.",
+      "t": [
+        ["Setiap", "every"], ["tahun", "year"], ",",
+        ["Indonesia", "Indonesia"], ["menghasilkan", "produces"],
+        ["sekitar", "around"],
+        ["empat", "four"], ["puluh", "ten"], ["lima", "five"],
+        ["sampai", "to"],
+        ["lima", "five"], ["puluh", "ten"],
+        ["juta", "million"], ["ton", "tons"],
+        ["CPO", "CPO"], "."
+      ]
+    },
+    {
+      "en": "The main destinations for this export are India, China, and the European Union.",
+      "t": [
+        ["Tujuan", "destinations"], ["utama", "main"],
+        ["ekspor", "of-export"], ["ini", "this"],
+        ["adalah", "are"], ["India", "India"], ",", ["Cina", "China"], ",",
+        ["dan", "and"], ["Uni", "Union"], ["Eropa", "European"], "."
+      ]
+    },
+    {
+      "en": "The price of palm oil is determined on the international market.",
+      "t": [
+        ["Harga", "price"], ["minyak", "of-oil"], ["sawit", "palm"],
+        ["ditentukan", "is-determined"], ["di", "on"],
+        ["pasar", "market"], ["internasional", "international"], "."
+      ]
+    },
+    {
+      "en": "The Rotterdam and Kuala Lumpur exchanges are the main references for the world price.",
+      "t": [
+        ["Bursa", "exchanges"], ["Rotterdam", "Rotterdam"],
+        ["dan", "and"], ["Kuala", "Kuala"], ["Lumpur", "Lumpur"],
+        ["menjadi", "become"], ["acuan", "reference"],
+        ["utama", "main"], ["untuk", "for"],
+        ["harga", "price"], ["dunia", "world"], "."
+      ]
+    },
+    {
+      "en": "Palm oil prices are very volatile, depending on supply, demand, and weather.",
+      "t": [
+        ["Harga", "price"], ["minyak", "of-oil"], ["sawit", "palm"],
+        ["sangat", "very"], ["fluktuatif", "volatile"], ",",
+        ["tergantung", "depending"], ["pada", "on"],
+        ["pasokan", "supply"], ",", ["permintaan", "demand"], ",",
+        ["dan", "and"], ["cuaca", "weather"], "."
+      ]
+    },
+    {
+      "en": "This industry employs millions of workers, both directly and indirectly.",
+      "t": [
+        ["Industri", "industry"], ["ini", "this"],
+        ["mempekerjakan", "employs"], ["jutaan", "millions"],
+        ["pekerja", "of-workers"], ",",
+        ["baik", "both"], ["secara", "in-a-manner"], ["langsung", "direct"],
+        ["maupun", "as-well-as"], ["tidak", "not"], ["langsung", "direct"], "."
+      ]
+    },
+    {
+      "en": "Many small farmers, called 'smallholders', also participate in this industry.",
+      "t": [
+        ["Banyak", "many"], ["petani", "farmers"], ["kecil", "small"], ",",
+        ["yang", "that-are"], ["disebut", "called"],
+        "\u201C", ["petani", "farmers"], ["plasma", "smallholder"], "\u201D", ",",
+        ["juga", "also"], ["ikut", "participate"],
+        ["dalam", "in"], ["industri", "industry"], ["ini", "this"], "."
+      ]
+    },
+    "PARA",
+    {
+      "en": "However, the palm oil industry also faces serious problems.",
+      "t": [
+        ["Namun", "however"], ",", ["industri", "industry"],
+        ["minyak", "oil"], ["sawit", "palm"],
+        ["juga", "also"], ["menghadapi", "faces"],
+        ["masalah", "problems"], ["yang", "that-are"], ["serius", "serious"], "."
+      ]
+    },
+    {
+      "en": "The expansion of plantations often causes tropical forest deforestation.",
+      "t": [
+        ["Perluasan", "expansion"], ["perkebunan", "of-plantations"],
+        ["sering", "often"], ["menyebabkan", "causes"],
+        ["penggundulan", "deforestation"], ["hutan", "of-forest"],
+        ["tropis", "tropical"], "."
+      ]
+    },
+    {
+      "en": "Vast forests in Sumatra and Kalimantan have been converted into oil palm plantations.",
+      "t": [
+        ["Hutan", "forests"], ["luas", "vast"],
+        ["di", "in"], ["Sumatra", "Sumatra"],
+        ["dan", "and"], ["Kalimantan", "Kalimantan"],
+        ["telah", "have-been"], ["diubah", "converted"],
+        ["menjadi", "into"], ["perkebunan", "plantations"],
+        ["sawit", "oil-palm"], "."
+      ]
+    },
+    {
+      "en": "As a result, the habitats of orangutans, tigers, and elephants have been threatened.",
+      "t": [
+        ["Akibatnya", "as-a-result"], ",",
+        ["habitat", "habitat"], ["orangutan", "of-orangutan"], ",",
+        ["harimau", "tiger"], ",", ["dan", "and"], ["gajah", "elephant"],
+        ["menjadi", "have-become"], ["terancam", "threatened"], "."
+      ]
+    },
+    {
+      "en": "Forest burning to clear land also produces enormous greenhouse gas emissions.",
+      "t": [
+        ["Pembakaran", "burning"], ["hutan", "of-forest"],
+        ["untuk", "to"], ["membuka", "open/clear"], ["lahan", "land"],
+        ["juga", "also"], ["menghasilkan", "produces"],
+        ["emisi", "emissions"], ["gas", "of-gas"],
+        ["rumah", "house"], ["kaca", "glass"],
+        ["yang", "that-is"], ["sangat", "very"], ["besar", "large"], "."
+      ]
+    },
+    {
+      "en": "The smoke from these fires often causes a haze crisis in the region.",
+      "t": [
+        ["Asap", "smoke"], ["dari", "from"],
+        ["kebakaran", "fires"], ["ini", "this"],
+        ["sering", "often"], ["menyebabkan", "causes"],
+        ["krisis", "crisis"], ["kabut", "of-haze"], ["asap", "smoke"],
+        ["di", "in"], ["wilayah", "the-region"], ["itu", "that"], "."
+      ]
+    },
+    {
+      "en": "Indigenous communities also sometimes lose their customary land.",
+      "t": [
+        ["Masyarakat", "community"], ["adat", "indigenous"],
+        ["juga", "also"], ["kadang", "sometimes"],
+        ["kehilangan", "lose"], ["tanah", "land"],
+        ["adat", "customary"], ["mereka", "their"], "."
+      ]
+    },
+    {
+      "en": "To address these problems, an organization called RSPO was formed.",
+      "t": [
+        ["Untuk", "to"], ["mengatasi", "address"],
+        ["masalah", "problems"], ["ini", "these"], ",",
+        ["dibentuklah", "was-formed"], ["organisasi", "organization"],
+        ["bernama", "named"], ["RSPO", "RSPO"], "."
+      ]
+    },
+    {
+      "en": "RSPO stands for 'Roundtable on Sustainable Palm Oil'.",
+      "t": [
+        ["RSPO", "RSPO"], ["adalah", "is"], ["singkatan", "abbreviation"],
+        ["dari", "of"], "\u201C", ["Roundtable", "roundtable"],
+        ["on", "on"], ["Sustainable", "sustainable"],
+        ["Palm", "palm"], ["Oil", "oil"], "\u201D", "."
+      ]
+    },
+    {
+      "en": "This organization provides certification for plantations that meet sustainability standards.",
+      "t": [
+        ["Organisasi", "organization"], ["ini", "this"],
+        ["memberikan", "provides"], ["sertifikasi", "certification"],
+        ["bagi", "for"], ["perkebunan", "plantations"],
+        ["yang", "that"], ["memenuhi", "meet"],
+        ["standar", "standards"], ["keberlanjutan", "of-sustainability"], "."
+      ]
+    },
+    {
+      "en": "However, critics state that this certification is not yet strict enough.",
+      "t": [
+        ["Namun", "however"], ",", ["para", "the"], ["pengkritik", "critics"],
+        ["menyatakan", "state"], ["bahwa", "that"],
+        ["sertifikasi", "certification"], ["ini", "this"],
+        ["belum", "not-yet"], ["cukup", "enough"], ["ketat", "strict"], "."
+      ]
+    },
+    {
+      "en": "The European Union has also imposed restrictions on palm oil imports for biofuel.",
+      "t": [
+        ["Uni", "union"], ["Eropa", "european"], ["juga", "also"],
+        ["telah", "has"], ["memberlakukan", "imposed"],
+        ["pembatasan", "restrictions"], ["impor", "import"],
+        ["minyak", "of-oil"], ["sawit", "palm"],
+        ["untuk", "for"], ["bahan", "material"], ["bakar", "fuel"], ["hayati", "bio"], "."
+      ]
+    },
+    {
+      "en": "These regulations sparked a trade dispute between Indonesia and Europe.",
+      "t": [
+        ["Peraturan", "regulations"], ["ini", "this"],
+        ["memicu", "sparked"], ["sengketa", "dispute"],
+        ["dagang", "trade"], ["antara", "between"],
+        ["Indonesia", "Indonesia"], ["dan", "and"], ["Eropa", "Europe"], "."
+      ]
+    },
+    "PARA",
+    {
+      "en": "The future of the palm oil industry depends on the balance between economy and ecology.",
+      "t": [
+        ["Masa", "future"], ["depan", "front"],
+        ["industri", "of-industry"], ["minyak", "oil"], ["sawit", "palm"],
+        ["bergantung", "depends"], ["pada", "on"],
+        ["keseimbangan", "balance"], ["antara", "between"],
+        ["ekonomi", "economy"], ["dan", "and"], ["ekologi", "ecology"], "."
+      ]
+    },
+    {
+      "en": "On one side, this commodity provides livelihoods for millions of people.",
+      "t": [
+        ["Di", "on"], ["satu", "one"], ["sisi", "side"], ",",
+        ["komoditas", "commodity"], ["ini", "this"],
+        ["memberikan", "provides"], ["penghidupan", "livelihood"],
+        ["bagi", "for"], ["jutaan", "millions"],
+        ["orang", "of-people"], "."
+      ]
+    },
+    {
+      "en": "On the other side, environmental damage cannot be ignored.",
+      "t": [
+        ["Di", "on"], ["sisi", "side"], ["lain", "other"], ",",
+        ["kerusakan", "damage"], ["lingkungan", "environmental"],
+        ["tidak", "not"], ["bisa", "can"], ["diabaikan", "be-ignored"], "."
+      ]
+    },
+    {
+      "en": "Many parties are now developing more sustainable practices.",
+      "t": [
+        ["Banyak", "many"], ["pihak", "parties"],
+        ["sekarang", "now"], ["mengembangkan", "are-developing"],
+        ["praktik", "practices"], ["yang", "that-are"],
+        ["lebih", "more"], ["berkelanjutan", "sustainable"], "."
+      ]
+    },
+    {
+      "en": "Examples include planting on degraded land, increasing yield per hectare, and protecting High Conservation Value forests.",
+      "t": [
+        ["Contohnya", "examples-its"], ":",
+        ["penanaman", "planting"], ["di", "on"],
+        ["lahan", "land"], ["terdegradasi", "degraded"], ",",
+        ["peningkatan", "increase"], ["hasil", "of-yield"],
+        ["per", "per"], ["hektar", "hectare"], ",",
+        ["dan", "and"], ["perlindungan", "protection"],
+        ["hutan", "of-forest"],
+        ["bernilai", "of-value"], ["konservasi", "conservation"],
+        ["tinggi", "high"], "."
+      ]
+    },
+    {
+      "en": "Consumers in many countries are also demanding palm oil that is more ethical.",
+      "t": [
+        ["Konsumen", "consumers"], ["di", "in"],
+        ["banyak", "many"], ["negara", "countries"],
+        ["juga", "also"], ["menuntut", "are-demanding"],
+        ["minyak", "oil"], ["sawit", "palm"],
+        ["yang", "that-is"], ["lebih", "more"], ["etis", "ethical"], "."
+      ]
+    },
+    {
+      "en": "Hopefully, in the future, palm oil can be produced without sacrificing nature.",
+      "t": [
+        ["Semoga", "hopefully"], ",",
+        ["di", "in"], ["masa", "time"], ["depan", "future"], ",",
+        ["minyak", "oil"], ["sawit", "palm"],
+        ["bisa", "can"], ["dihasilkan", "be-produced"],
+        ["tanpa", "without"], ["mengorbankan", "sacrificing"], ["alam", "nature"], "."
+      ]
+    }
+  ]
+}
