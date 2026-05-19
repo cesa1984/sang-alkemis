@@ -153,7 +153,10 @@ dir das Wort wirklich einprägst) und Spaced Repetition über Tage
 
 **Wie eine Session abläuft:**
 
-1. Du beginnst mit **10 Wörtern**.
+1. Beim Start wählst du die Session-Länge:
+   - **5 Wörter** — schnelle Runde, ca. 3 Min (gut für unterwegs)
+   - **10 Wörter** — Standard, ca. 7 Min
+   - **20 Wörter** — tiefes Üben, ca. 15 Min
 2. Jedes Wort wird auf einer großen Karte angezeigt — du denkst die
    englische Übersetzung.
 3. Tippe auf die Karte zum Aufdecken.
@@ -162,18 +165,30 @@ dir das Wort wirklich einprägst) und Spaced Repetition über Tage
    du jedes Wort gut kannst.
 6. Wenn du ein Wort **2× hintereinander richtig** hast, "graduiert" es —
    und kommt erst morgen wieder.
-7. Nach Abschluss: Zusammenfassung mit zwei wichtigen Knöpfen:
+7. Nach Abschluss: Zusammenfassung mit zwei Knöpfen:
    - **"Repeat today's words"** — die heute gelernten Wörter nochmal
      üben, um sie noch besser einzuprägen.
-   - **"Start new session"** — 10 neue Wörter beginnen.
+   - **"Start new session"** — neue Wörter beginnen.
+
+**Pausieren und Fortsetzen:**
+
+Du kannst jederzeit den Zurück-Pfeil drücken oder die App schließen.
+Beim nächsten Öffnen siehst du oben einen Knopf
+**"Continue session"** und kannst genau dort weitermachen, wo
+du aufgehört hast. Eine Session bleibt **18 Stunden** wiederherstellbar —
+danach wird sie automatisch verworfen (damit nicht alte Reste den
+nächsten Tag stören).
 
 **Wie die Wiederholung funktioniert:**
 
 | Antwort | Nächste Sichtung |
 |---------|-------------------|
-| Falsch  | sehr bald wieder (~3 Karten später) |
-| 1× richtig | etwas später (~7 Karten) |
+| Falsch  | gleich wieder (1 Karte später) |
+| 1× richtig | bald wieder (3 Karten später) |
 | 2× richtig in Folge | graduiert! morgen wieder |
+
+Das ist absichtlich **sehr eng**: ein Wort, das du gerade falsch hattest,
+kommt fast sofort wieder — bevor du es vergessen kannst.
 
 Wenn ein bereits graduiertes Wort an einem späteren Tag falsch
 beantwortet wird, fällt es zurück in die Lern-Phase und wird
@@ -204,11 +219,23 @@ Grammatikalische Partikel wie *yang, di, ke, dan, itu* und sehr
 kurze Wörter — die lernst du beim Lesen ohnehin automatisch und
 sie wären im Test nur Lärm.
 
-**Tipp:** Mach am besten **mehrere Sessions am selben Tag**, vor allem
-am Anfang. Eine erste Session führt 10 Wörter ein, eine zweite
-Wiederholung am Abend mit "Repeat today's words" prägt sie tief ins
-Gedächtnis ein. Morgen kommen sie dann automatisch nochmal in der
-Spaced-Repetition-Wiederholung.
+**Tipp:** Mach am besten **mehrere kurze Sessions am Tag** statt einer
+langen. Drei 5er-Sessions verteilt (morgens, mittags, abends) prägen
+sich besser ein als eine 20er-Session am Stück — das ist gut erforscht.
+
+---
+
+## "Zuletzt geöffnet wo?" — Resume-Funktion
+
+Wenn du die App schließt und neu öffnest, springt sie automatisch
+zurück zu dem Bereich, den du zuletzt offen hattest:
+
+- **Reader** → öffnet das zuletzt gelesene Kapitel direkt
+- **Wörterbuch** → öffnet die Wörterbuch-Ansicht
+- **Test** → zeigt den Start-Screen (mit "Continue session", falls
+  du noch eine angefangen hattest)
+
+So musst du dich nicht jedesmal neu durchklicken.
 
 ---
 

@@ -97,15 +97,39 @@
     <div class="test-intro">
       <p><strong>How it works:</strong></p>
       <ul>
-        <li>You'll be shown <b>10 Indonesian words</b>, one at a time.</li>
-        <li>Think of the English translation, then tap the card to reveal it.</li>
+        <li>Pick a session length below — short for a quick spin, long for deep practice.</li>
+        <li>Indonesian words appear one at a time. Think the English translation, then tap to reveal.</li>
         <li>Mark whether you <b>knew it</b> or <b>didn't</b>.</li>
-        <li>Words you know move further apart in time (spaced repetition). Words you don't know come back tomorrow.</li>
-        <li>New words are introduced by frequency in the book — the most common ones first.</li>
+        <li>Words you don't know come back <b>right away</b>. Words you know move further apart.</li>
+        <li>After 2× correct in a row, a new word "graduates" and you'll see it again tomorrow.</li>
       </ul>
     </div>
     <div class="test-status" id="test-status-info"></div>
-    <button id="test-begin-btn" class="action-btn primary big-btn">Start session</button>
+
+    <!-- Resume area: only shown when an unfinished session exists -->
+    <div id="test-resume-container" class="test-resume-container hidden"></div>
+
+    <!-- Size choices: only shown when no active session -->
+    <div id="test-size-choices" class="test-size-choices">
+      <div class="test-size-label">Choose session length:</div>
+      <div class="test-size-buttons">
+        <button class="test-size-btn action-btn" data-size="5">
+          <span class="size-num">5</span>
+          <span class="size-sub">quick · ~3 min</span>
+        </button>
+        <button class="test-size-btn action-btn primary" data-size="10">
+          <span class="size-num">10</span>
+          <span class="size-sub">standard · ~7 min</span>
+        </button>
+        <button class="test-size-btn action-btn" data-size="20">
+          <span class="size-num">20</span>
+          <span class="size-sub">deep · ~15 min</span>
+        </button>
+      </div>
+      <div id="test-nothing-msg" class="test-nothing-msg hidden">
+        Nothing to review right now — come back later or read a new chapter.
+      </div>
+    </div>
   </div>
 
   <!-- Test card screen -->

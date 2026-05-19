@@ -14,6 +14,8 @@
     PROGRESS: 'sangalkemis_progress_v1',
     SETTINGS: 'sangalkemis_settings_v1',
     SRS: 'sangalkemis_srs_v1',
+    LAST_VIEW: 'sangalkemis_lastview_v1',
+    ACTIVE_SESSION: 'sangalkemis_activesession_v1',
   };
 
   // Built-in chapters loaded from /chapters/ folder
@@ -40,6 +42,8 @@
   let srsData = {};
   // Current test session state
   let testSession = null; // { queue: [keys], currentIdx: 0, results: [{key, knew}], totalCorrect: 0, newWords: 0 }
+  // Last view info (for resume on app open): { view: 'library'|'reader'|'dict'|'test', chapterId?: string }
+  let lastView = null;
 
   // ============================================================
   // STORAGE HELPERS
@@ -66,6 +70,10 @@
         }
         if (migrated) saveSRS();
       }
+      const lv = localStorage.getItem(STORAGE_KEYS.LAST_VIEW);
+      if (lv) {
+        try { lastView = JSON.parse(lv); } catch (e) { lastView = null; }
+      }
     } catch (e) {
       console.error('Storage load failed:', e);
     }
@@ -86,6 +94,70 @@
   function saveSRS() {
     try { localStorage.setItem(STORAGE_KEYS.SRS, JSON.stringify(srsData)); }
     catch (e) { console.error('Save SRS failed:', e); }
+  }
+
+  function saveLastView(viewName, extra) {
+    try {
+      lastView = Object.assign({ view: viewName }, extra || {});
+      localStorage.setItem(STORAGE_KEYS.LAST_VIEW, JSON.stringify(lastView));
+    } catch (e) { console.error('Save lastView failed:', e); }
+  }
+
+  function saveActiveSession() {
+    try {
+      if (!testSession) {
+        localStorage.removeItem(STORAGE_KEYS.ACTIVE_SESSION);
+        return;
+      }
+      // Serialize Sets to arrays
+      const serial = {
+        initialWords: testSession.initialWords,
+        queue: testSession.queue,
+        currentIdx: testSession.currentIdx,
+        results: testSession.results,
+        uniqueAnswered: Array.from(testSession.uniqueAnswered),
+        totalCorrect: testSession.totalCorrect,
+        totalAnswers: testSession.totalAnswers,
+        newWords: testSession.newWords,
+        graduatedKeys: Array.from(testSession.graduatedKeys),
+        startedAt: testSession.startedAt,
+      };
+      localStorage.setItem(STORAGE_KEYS.ACTIVE_SESSION, JSON.stringify(serial));
+    } catch (e) { console.error('Save session failed:', e); }
+  }
+
+  function loadActiveSession() {
+    try {
+      const s = localStorage.getItem(STORAGE_KEYS.ACTIVE_SESSION);
+      if (!s) return null;
+      const data = JSON.parse(s);
+      // Check session is from today; if older than 18 hours, discard
+      const ageMs = Date.now() - (data.startedAt || 0);
+      if (ageMs > 18 * 60 * 60 * 1000) {
+        localStorage.removeItem(STORAGE_KEYS.ACTIVE_SESSION);
+        return null;
+      }
+      return {
+        initialWords: data.initialWords || [],
+        queue: data.queue || [],
+        currentIdx: data.currentIdx || 0,
+        results: data.results || [],
+        uniqueAnswered: new Set(data.uniqueAnswered || []),
+        totalCorrect: data.totalCorrect || 0,
+        totalAnswers: data.totalAnswers || 0,
+        newWords: data.newWords || 0,
+        graduatedKeys: new Set(data.graduatedKeys || []),
+        startedAt: data.startedAt || Date.now(),
+      };
+    } catch (e) {
+      console.error('Load session failed:', e);
+      return null;
+    }
+  }
+
+  function clearActiveSession() {
+    try { localStorage.removeItem(STORAGE_KEYS.ACTIVE_SESSION); }
+    catch (e) {}
   }
 
   // Word key: normalize for consistent lookup
@@ -672,9 +744,11 @@
 
   // Re-injection delays within a session (in card-positions ahead)
   // After the user answers, where do we put the same card back in the queue?
-  const LEARNING_DELAY_WRONG = 3;         // wrong → very soon
-  const LEARNING_DELAY_FIRST_CORRECT = 7; // first correct → medium delay
-  const LEARNING_DELAY_LATER_CORRECT = 12;// later correct → longer delay
+  // TIGHTENED in v5: shorter delays so user sees the word again before forgetting it.
+  // Pimsleur-style: very soon, then medium, then a bit longer.
+  const LEARNING_DELAY_WRONG = 1;          // wrong → next or one after
+  const LEARNING_DELAY_FIRST_CORRECT = 3;  // first correct → see it again very soon
+  const LEARNING_DELAY_LATER_CORRECT = 6;  // later correct → moderate gap before final test
 
   // Indonesian grammatical particles and very common function words to EXCLUDE
   const TEST_EXCLUDED_WORDS = new Set([
@@ -843,7 +917,12 @@
 
   function openTestView() {
     showView('test-view');
-    renderTestStart();
+    // If an in-memory session is mid-flight, jump straight to the card
+    if (testSession && testSession.queue && testSession.queue.length > 0) {
+      showCurrentCard();
+    } else {
+      renderTestStart();
+    }
   }
 
   function renderTestStart() {
@@ -888,6 +967,7 @@
     }
 
     const totalTestable = allWords.length;
+    const nothingToReview = dueCount === 0 && newCount === 0 && learningCount === 0;
 
     document.getElementById('test-status-info').innerHTML = `
       <span class="stat-line"><b>${dueCount}</b> word${dueCount === 1 ? '' : 's'} due for review</span>
@@ -897,24 +977,63 @@
       ${nextDueText ? `<span class="stat-line" style="margin-top:0.5rem">${nextDueText}</span>` : ''}
     `;
 
-    const beginBtn = document.getElementById('test-begin-btn');
-    if (dueCount === 0 && newCount === 0 && learningCount === 0) {
-      beginBtn.disabled = true;
-      beginBtn.textContent = 'Nothing to review';
-      beginBtn.style.opacity = '0.5';
-      beginBtn.style.cursor = 'not-allowed';
+    // Check for resumable session
+    const stored = loadActiveSession();
+    const resumeContainer = document.getElementById('test-resume-container');
+    if (stored && stored.queue && stored.queue.length > 0) {
+      const remaining = stored.queue.length;
+      const total = stored.initialWords.length;
+      const graduated = stored.graduatedKeys.size;
+      resumeContainer.innerHTML = `
+        <div class="resume-info">
+          You have an unfinished session: <b>${graduated} / ${total}</b> graduated,
+          <b>${remaining}</b> card${remaining === 1 ? '' : 's'} left in the queue.
+        </div>
+        <button id="test-resume-btn" class="action-btn primary big-btn">Continue session</button>
+        <button id="test-discard-btn" class="action-btn small">Start fresh instead</button>
+      `;
+      resumeContainer.classList.remove('hidden');
+      document.getElementById('test-size-choices').classList.add('hidden');
+      // Wire up new buttons
+      document.getElementById('test-resume-btn').addEventListener('click', () => {
+        testSession = stored;
+        showCurrentCard();
+      });
+      document.getElementById('test-discard-btn').addEventListener('click', () => {
+        clearActiveSession();
+        renderTestStart();
+      });
     } else {
-      beginBtn.disabled = false;
-      beginBtn.textContent = 'Start session';
-      beginBtn.style.opacity = '';
-      beginBtn.style.cursor = '';
+      resumeContainer.innerHTML = '';
+      resumeContainer.classList.add('hidden');
+      document.getElementById('test-size-choices').classList.remove('hidden');
+      // Configure size buttons
+      const sizeButtons = document.querySelectorAll('.test-size-btn');
+      sizeButtons.forEach(btn => {
+        if (nothingToReview) {
+          btn.disabled = true;
+          btn.style.opacity = '0.4';
+          btn.style.cursor = 'not-allowed';
+        } else {
+          btn.disabled = false;
+          btn.style.opacity = '';
+          btn.style.cursor = '';
+        }
+      });
+      if (nothingToReview) {
+        document.getElementById('test-nothing-msg').classList.remove('hidden');
+      } else {
+        document.getElementById('test-nothing-msg').classList.add('hidden');
+      }
     }
   }
 
   // Begin a new session.
   // mode = 'auto' (default): pick new/due words
   // mode = 'repeat': use the same word set as last session (today's words again)
-  function beginTestSession(mode) {
+  // size = number of unique words to start with (default 10)
+  function beginTestSession(mode, size) {
+    const sessionSize = size || 10;
     let initialWords;
     if (mode === 'repeat' && testSession && testSession.initialWords && testSession.initialWords.length > 0) {
       // Reset learning state for these words so user can practice them again
@@ -932,7 +1051,7 @@
       }
       saveSRS();
     } else {
-      initialWords = pickSessionWords(10);
+      initialWords = pickSessionWords(sessionSize);
     }
 
     if (initialWords.length === 0) {
@@ -950,7 +1069,7 @@
     saveSRS();
 
     testSession = {
-      initialWords: initialWords.slice(),  // The 10 we started with (preserved)
+      initialWords: initialWords.slice(),  // The N we started with (preserved)
       queue: shuffle(initialWords.slice()),// Working queue, gets re-injected
       currentIdx: 0,
       results: [],                          // every answer in order
@@ -961,6 +1080,7 @@
       graduatedKeys: new Set(),            // keys graduated this session
       startedAt: Date.now(),
     };
+    saveActiveSession();
     showCurrentCard();
   }
 
@@ -1050,6 +1170,7 @@
     }
 
     saveSRS();
+    saveActiveSession();
 
     // currentIdx stays the same (we removed the current one; next card slides into idx)
     setTimeout(() => showCurrentCard(), 200);
@@ -1059,6 +1180,8 @@
     document.getElementById('test-card-screen').classList.add('hidden');
     document.getElementById('test-summary').classList.remove('hidden');
     document.getElementById('test-progress').textContent = '';
+    // Session reached its end (queue empty) — clear the persisted state
+    clearActiveSession();
 
     const totalAnswers = testSession.totalAnswers;
     const correct = testSession.totalCorrect;
@@ -1162,6 +1285,13 @@
     document.getElementById(viewId).classList.remove('hidden');
     if (viewId === 'library-view') {
       renderLibrary();
+      saveLastView('library');
+    } else if (viewId === 'dict-view') {
+      saveLastView('dict');
+    } else if (viewId === 'test-view') {
+      saveLastView('test');
+    } else if (viewId === 'reader-view') {
+      saveLastView('reader', { chapterId: currentChapter && currentChapter.id });
     }
   }
 
@@ -1207,11 +1337,17 @@
   // Test view bindings
   document.getElementById('test-start-btn').addEventListener('click', openTestView);
   document.getElementById('test-back-btn').addEventListener('click', () => {
-    testSession = null;
+    // Don't drop testSession here — it might be in progress and resumable later.
+    // Just navigate away. Active session is already persisted in localStorage.
     showView('dict-view');
   });
-  document.getElementById('test-begin-btn').addEventListener('click', () => {
-    if (!document.getElementById('test-begin-btn').disabled) beginTestSession('auto');
+  // Size choice buttons — replace the single "start" button
+  document.querySelectorAll('.test-size-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+      const size = parseInt(btn.dataset.size, 10) || 10;
+      beginTestSession('auto', size);
+    });
   });
   document.getElementById('test-card').addEventListener('click', revealCard);
   document.getElementById('test-right-btn').addEventListener('click', (e) => {
@@ -1224,22 +1360,26 @@
   });
   document.getElementById('test-restart-btn').addEventListener('click', () => {
     // If some words from current session are not yet graduated, continue with same.
-    // Otherwise start a fresh session with new words.
+    // Otherwise start a fresh session with the same size as before.
     if (testSession) {
       const graduated = testSession.graduatedKeys.size;
       const total = testSession.initialWords.length;
       if (graduated < total) {
-        beginTestSession('repeat');
+        beginTestSession('repeat', total);
         return;
       }
+      beginTestSession('auto', total);
+      return;
     }
-    beginTestSession('auto');
+    beginTestSession('auto', 10);
   });
   document.getElementById('test-repeat-btn').addEventListener('click', () => {
-    beginTestSession('repeat');
+    const size = (testSession && testSession.initialWords.length) || 10;
+    beginTestSession('repeat', size);
   });
   document.getElementById('test-finish-btn').addEventListener('click', () => {
     testSession = null;
+    clearActiveSession();
     showView('dict-view');
   });
 
@@ -1247,8 +1387,10 @@
     if (confirm('Really delete all progress? (Chapters will be kept.)')) {
       progress = {};
       srsData = {};
+      testSession = null;
       saveProgress();
       saveSRS();
+      clearActiveSession();
       toast('Progress reset');
       renderLibrary();
     }
@@ -1322,6 +1464,27 @@
   async function init() {
     loadFromStorage();
     await loadBuiltinChapters();
+    // Restore last view if it makes sense
+    if (lastView && lastView.view) {
+      if (lastView.view === 'reader' && lastView.chapterId && chapters[lastView.chapterId]) {
+        openChapter(lastView.chapterId);
+        return;
+      }
+      if (lastView.view === 'dict') {
+        openDictionary();
+        return;
+      }
+      if (lastView.view === 'test') {
+        // If a saved session exists, restore it into memory so the test view
+        // jumps straight to the current card rather than the start screen.
+        const stored = loadActiveSession();
+        if (stored && stored.queue && stored.queue.length > 0) {
+          testSession = stored;
+        }
+        openTestView();
+        return;
+      }
+    }
     showView('library-view');
   }
 
